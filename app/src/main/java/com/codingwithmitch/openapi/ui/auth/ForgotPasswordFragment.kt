@@ -31,7 +31,7 @@ class ForgotPasswordFragment : BaseAuthFragment() {
         }
     }
 
-    fun subscribeObservers(){
+    private fun subscribeObservers(){
         viewModel.viewState.observe(viewLifecycleOwner, Observer {
             it.resetPasswordFields?.let { resetPasswordFields ->
                 resetPasswordFields.reset_email?.let { input_email.setText(it) }
@@ -39,7 +39,7 @@ class ForgotPasswordFragment : BaseAuthFragment() {
         })
     }
 
-    fun resetPassword(){
+    private fun resetPassword(){
         viewModel.setStateEvent(
             AuthStateEvent.ResetPasswordAttemptEvent(
                 input_email.text.toString()
@@ -47,13 +47,12 @@ class ForgotPasswordFragment : BaseAuthFragment() {
         )
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
         viewModel.setResetPasswordFields(
             ResetPasswordFields(
                 input_email.text.toString()
             )
         )
-
     }
 }

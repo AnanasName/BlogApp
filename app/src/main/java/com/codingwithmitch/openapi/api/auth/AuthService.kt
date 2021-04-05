@@ -147,7 +147,9 @@ constructor(
                     }
                     .await()
 
+
                 accountPropertiesDao.insertOrIgnore(user)
+
 
                 saveAuthenticatedUserToPrefs(email)
             }
@@ -157,14 +159,18 @@ constructor(
     }
 
     suspend fun resetPassword(email: String): DataState<AuthViewState> {
-        var result: DataState<AuthViewState> = DataState.error(Response("Error occurred", ResponseType.Dialog))
+        var result: DataState<AuthViewState> =
+            DataState.error(Response("Error occurred", ResponseType.Dialog))
 
         return safeApiCall {
             auth.sendPasswordResetEmail(email)
                 .addOnSuccessListener {
                     result = DataState.data(
                         data = AuthViewState(),
-                        response = Response("Check your email for reset password", ResponseType.Toast)
+                        response = Response(
+                            "Check your email for reset password",
+                            ResponseType.Toast
+                        )
                     )
                 }
                 .addOnFailureListener {
