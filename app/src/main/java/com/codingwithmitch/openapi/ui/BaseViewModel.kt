@@ -5,9 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 
-abstract class BaseViewModel<StateEvent, ViewState>: ViewModel() {
-
-    val TAG = "AppDebug"
+abstract class BaseViewModel<StateEvent, ViewState> : ViewModel() {
 
     protected val _stateEvent: MutableLiveData<StateEvent> = MutableLiveData()
     protected val _viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -15,18 +13,19 @@ abstract class BaseViewModel<StateEvent, ViewState>: ViewModel() {
     val viewState: LiveData<ViewState>
         get() = _viewState
 
-    val dataState: LiveData<DataState<ViewState>> = Transformations
-        .switchMap(_stateEvent){ stateEvent ->
-            stateEvent?.let {
-                handleStateEvent(stateEvent)
-            }
-        }
+    protected val _dataState: MutableLiveData<DataState<ViewState>> = MutableLiveData()
 
-    fun setStateEvent(event: StateEvent){
+    val dataState: LiveData<DataState<ViewState>>
+        get() = _dataState
+
+    fun setStateEvent(event: StateEvent) {
         _stateEvent.value = event
+        event?.let {
+            handleStateEvent(event)
+        }
     }
 
-    fun getCurrentViewStateOrNew(): ViewState{
+    fun getCurrentViewStateOrNew(): ViewState {
         val value = viewState.value?.let {
             it
         } ?: initViewState()
@@ -35,5 +34,5 @@ abstract class BaseViewModel<StateEvent, ViewState>: ViewModel() {
 
     abstract fun initViewState(): ViewState
 
-    abstract fun handleStateEvent(stateEvent: StateEvent): LiveData<DataState<ViewState>>
+    abstract fun handleStateEvent(stateEvent: StateEvent)
 }

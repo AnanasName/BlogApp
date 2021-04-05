@@ -16,4 +16,10 @@ data class AccountProperties(
 
     @ColumnInfo(name = "username")
     var username: String
-)
+){
+    constructor(): this(
+        "",
+        "",
+        ""
+    )
+}

@@ -1,8 +1,8 @@
 package com.codingwithmitch.openapi.di.auth
 
+import android.content.SharedPreferences
 import com.codingwithmitch.openapi.api.auth.AuthService
 import com.codingwithmitch.openapi.persistence.AccountPropertiesDao
-import com.codingwithmitch.openapi.persistence.AuthTokenDao
 import com.codingwithmitch.openapi.repository.auth.AuthRepository
 import com.codingwithmitch.openapi.session.SessionManager
 import com.google.firebase.auth.FirebaseAuth
@@ -16,12 +16,18 @@ class AuthModule {
     @AuthScope
     @Provides
     fun provideApiService(
+        accountPropertiesDao: AccountPropertiesDao,
         firebaseFirestore: FirebaseFirestore,
-        firebaseAuth: FirebaseAuth
+        firebaseAuth: FirebaseAuth,
+        sharedPreferences: SharedPreferences,
+        sharedPrefsEditor: SharedPreferences.Editor
     ): AuthService{
         return AuthService(
             firebaseAuth,
-            firebaseFirestore
+            firebaseFirestore,
+            accountPropertiesDao,
+            sharedPreferences,
+            sharedPrefsEditor
         )
     }
 
@@ -29,13 +35,9 @@ class AuthModule {
     @Provides
     fun provideAuthRepository(
         sessionManager: SessionManager,
-        authTokenDao: AuthTokenDao,
-        accountPropertiesDao: AccountPropertiesDao,
         authService: AuthService
     ): AuthRepository{
         return AuthRepository(
-            authTokenDao,
-            accountPropertiesDao,
             authService,
             sessionManager
         )

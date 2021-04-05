@@ -2,18 +2,18 @@ package com.codingwithmitch.openapi.ui.main
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
-import android.util.Log
-import androidx.lifecycle.Observer
+import android.view.View
 import com.codingwithmitch.openapi.R
 import com.codingwithmitch.openapi.ui.BaseActivity
 import com.codingwithmitch.openapi.ui.auth.AuthActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.google.rpc.context.AttributeContext
+import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import kotlinx.android.synthetic.main.activity_main.*
-import javax.inject.Inject
+
 
 class MainActivity : BaseActivity() {
+
+    lateinit var authListener: AuthStateListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,6 +22,10 @@ class MainActivity : BaseActivity() {
         subscribeObservers()
 
         checkIsLogged()
+
+        tool_bar.setOnClickListener {
+            sessionManager.logout()
+        }
     }
 
     private fun checkIsLogged() {
@@ -29,14 +33,35 @@ class MainActivity : BaseActivity() {
             navAuthActivity()
     }
 
-    fun subscribeObservers(){
-
+    fun subscribeObservers() {
+        setAuthListener()
     }
 
-    private fun navAuthActivity(){
+    private fun navAuthActivity() {
         val intent = Intent(this, AuthActivity::class.java)
         startActivity(intent)
         finish()
+    }
+
+    private fun setAuthListener() {
+        authListener = AuthStateListener { auth ->
+            if (auth.currentUser == null)
+                navAuthActivity()
+        }
+
+        sessionManager.setAuthListener(authListener)
+    }
+
+    override fun displayProgressBar(boolean: Boolean) {
+        if (boolean)
+            progress_bar.visibility = View.VISIBLE
+        else
+            progress_bar.visibility = View.INVISIBLE
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        sessionManager.removeAuthListener(authListener)
     }
 
 }

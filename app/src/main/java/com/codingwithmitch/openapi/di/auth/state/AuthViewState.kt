@@ -5,6 +5,7 @@ import com.codingwithmitch.openapi.models.AuthToken
 data class AuthViewState(
     var registrationFields: RegistrationFields? = RegistrationFields(),
     var loginFields: LoginFields? = LoginFields(),
+    var resetPasswordFields: ResetPasswordFields? = ResetPasswordFields(),
     var authToken: AuthToken? = null
 )
 
@@ -74,5 +75,35 @@ data class LoginFields(
 
     override fun toString(): String {
         return "LoginState(email=$login_email, password=$login_password)"
+    }
+}
+
+data class ResetPasswordFields(
+    var reset_email: String? = null
+){
+
+    class ResetPasswordError{
+
+        companion object{
+
+            fun mustFillAllFields(): String{
+                return "You can't reset password without email"
+            }
+
+            fun none(): String{
+                return "None"
+            }
+        }
+    }
+
+    fun isValidLogin(): String{
+
+        if (reset_email.isNullOrEmpty())
+            return ResetPasswordError.mustFillAllFields()
+        return ResetPasswordError.none()
+    }
+
+    override fun toString(): String {
+        return "LoginState(email=$reset_email)"
     }
 }

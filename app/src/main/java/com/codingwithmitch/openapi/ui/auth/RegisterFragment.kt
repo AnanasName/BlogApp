@@ -45,10 +45,10 @@ class RegisterFragment : BaseAuthFragment() {
     fun register(){
         viewModel.setStateEvent(
             AuthStateEvent.RegisterAttemptEvent(
-                input_email.toString(),
-                input_username.toString(),
-                input_password.toString(),
-                input_password_confirm.toString()
+                input_email.text.toString(),
+                input_username.text.toString(),
+                input_password.text.toString(),
+                input_password_confirm.text.toString()
             )
         )
     }
