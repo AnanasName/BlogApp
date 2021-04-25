@@ -16,6 +16,7 @@ import com.codingwithmitch.openapi.ui.main.blog.ViewBlogFragment
 import com.codingwithmitch.openapi.util.BottomNavController
 import com.codingwithmitch.openapi.util.BottomNavController.*
 import com.codingwithmitch.openapi.util.setupNavigation
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
@@ -126,7 +127,7 @@ class MainActivity : BaseActivity(),
     }
 
     override fun onGraphChange() {
-
+        expandAppbar()
     }
 
     override fun onReselectItem(navController: NavController, fragment: Fragment) = when(fragment){
@@ -150,6 +151,10 @@ class MainActivity : BaseActivity(),
         else -> {
 
         }
+    }
+
+    override fun expandAppbar() {
+        findViewById<AppBarLayout>(R.id.app_bar).setExpanded(true)
     }
 
 }

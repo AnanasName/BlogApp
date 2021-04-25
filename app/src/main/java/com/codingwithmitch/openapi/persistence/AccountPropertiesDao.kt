@@ -17,8 +17,11 @@ interface AccountPropertiesDao {
     suspend fun insertOrIgnore(accountProperties: AccountProperties): Long
 
     @Query("SELECT * FROM account_properties WHERE pk = :pk")
-    suspend fun searchByPk(pk: Int): AccountProperties?
+    suspend fun searchByPk(pk: String): AccountProperties?
 
     @Query("SELECT * FROM account_properties WHERE email = :email")
     suspend fun searchByEmail(email: String): AccountProperties?
+
+    @Query("UPDATE account_properties SET email = :email, username = :username WHERE pk = :pk")
+    suspend fun updateAccountProperties(pk: String, email: String, username: String)
 }

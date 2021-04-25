@@ -28,50 +28,15 @@ constructor(
         when (stateEvent) {
 
             is LoginAttemptEvent -> {
-                _dataState.value = DataState.loading(true, null)
-
-                initNewJob()
-
-                var result: DataState<AuthViewState>?
-
-                coroutineScope.launch {
-                    result = authRepository.attemptLogin(stateEvent.email, stateEvent.password)
-
-                    _dataState.value = result
-                }
+                performLogin(stateEvent)
             }
 
             is RegisterAttemptEvent -> {
-
-                initNewJob()
-
-                var result: DataState<AuthViewState>?
-                coroutineScope.launch {
-                    _dataState.value = DataState.loading(true, null)
-
-                    result = authRepository.attemptRegister(
-                        stateEvent.email,
-                        stateEvent.username,
-                        stateEvent.password,
-                        stateEvent.confirm_password
-                    )
-
-                    _dataState.value = result
-                }
+                performRegister(stateEvent)
             }
 
             is ResetPasswordAttemptEvent -> {
-
-                initNewJob()
-
-                var result: DataState<AuthViewState>?
-                coroutineScope.launch {
-                    result = authRepository.attemptResetPassword(
-                        stateEvent.email
-                    )
-
-                    _dataState.value = result
-                }
+                performResetPassword(stateEvent)
             }
 
             is CheckPreviousAuthEvent -> {
@@ -129,5 +94,51 @@ constructor(
     override fun onCleared() {
         super.onCleared()
         cancelJobs()
+    }
+
+    private fun performLogin(stateEvent: LoginAttemptEvent){
+        _dataState.value = DataState.loading(true, null)
+
+        initNewJob()
+
+        var result: DataState<AuthViewState>?
+
+        coroutineScope.launch {
+            result = authRepository.attemptLogin(stateEvent.email, stateEvent.password)
+
+            _dataState.value = result
+        }
+    }
+
+    private fun performRegister(stateEvent: RegisterAttemptEvent){
+
+        initNewJob()
+
+        var result: DataState<AuthViewState>?
+        coroutineScope.launch {
+            _dataState.value = DataState.loading(true, null)
+
+            result = authRepository.attemptRegister(
+                stateEvent.email,
+                stateEvent.username,
+                stateEvent.password,
+                stateEvent.confirm_password
+            )
+
+            _dataState.value = result
+        }
+    }
+
+    private fun performResetPassword(stateEvent: ResetPasswordAttemptEvent){
+        initNewJob()
+
+        var result: DataState<AuthViewState>?
+        coroutineScope.launch {
+            result = authRepository.attemptResetPassword(
+                stateEvent.email
+            )
+
+            _dataState.value = result
+        }
     }
 }

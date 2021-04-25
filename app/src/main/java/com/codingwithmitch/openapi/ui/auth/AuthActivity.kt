@@ -15,6 +15,7 @@ import com.codingwithmitch.openapi.ui.BaseActivity
 import com.codingwithmitch.openapi.ui.ResponseType
 import com.codingwithmitch.openapi.ui.main.MainActivity
 import com.codingwithmitch.openapi.viewmodels.ViewModelProviderFactory
+import com.google.android.material.appbar.AppBarLayout
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_auth.*
 import javax.inject.Inject
@@ -84,5 +85,9 @@ class AuthActivity : BaseActivity(),
         } else {
             progress_bar.visibility = View.INVISIBLE
         }
+    }
+
+    override fun expandAppbar() {
+
     }
 }

@@ -8,6 +8,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withContext
@@ -79,6 +80,15 @@ suspend fun <T> safeApiCall(
                 DataState.error<T>(
                     Response(
                         "There is no user record corresponding to this email or password doesn't match the email address",
+                        ResponseType.Dialog
+                    )
+                )
+            }
+
+            is FirebaseFirestoreException -> {
+                DataState.error<T>(
+                    Response(
+                        throwable.localizedMessage,
                         ResponseType.Dialog
                     )
                 )

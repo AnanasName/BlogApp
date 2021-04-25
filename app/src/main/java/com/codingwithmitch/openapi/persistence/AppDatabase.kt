@@ -5,7 +5,7 @@ import androidx.room.RoomDatabase
 import com.codingwithmitch.openapi.models.AccountProperties
 import com.codingwithmitch.openapi.models.AuthToken
 
-@Database(entities = [AccountProperties::class], version = 3)
+@Database(entities = [AccountProperties::class], version = 4)
 abstract class AppDatabase: RoomDatabase() {
 
     abstract fun getAccountPropertiesDao(): AccountPropertiesDao

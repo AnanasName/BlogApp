@@ -17,6 +17,10 @@ constructor(
 )
 {
 
+    fun getId(): String?{
+        return firebaseAuth.uid
+    }
+
     fun logout(){
         firebaseAuth.signOut()
     }
