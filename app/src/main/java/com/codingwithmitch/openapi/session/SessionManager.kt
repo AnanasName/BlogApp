@@ -5,6 +5,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -45,6 +46,10 @@ constructor(
 
     fun removeAuthListener(listener: FirebaseAuth.AuthStateListener){
         firebaseAuth.removeAuthStateListener(listener)
+    }
+
+    fun getCurrentUser(): FirebaseUser? {
+        return firebaseAuth.currentUser
     }
 
 }

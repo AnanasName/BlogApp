@@ -7,6 +7,8 @@ import com.codingwithmitch.openapi.repository.main.AccountRepository
 import com.codingwithmitch.openapi.session.SessionManager
 import com.codingwithmitch.openapi.ui.BaseViewModel
 import com.codingwithmitch.openapi.ui.DataState
+import com.codingwithmitch.openapi.ui.Response
+import com.codingwithmitch.openapi.ui.ResponseType
 import com.codingwithmitch.openapi.ui.main.account.state.AccountStateEvent
 import com.codingwithmitch.openapi.ui.main.account.state.AccountStateEvent.*
 import com.codingwithmitch.openapi.ui.main.account.state.AccountViewState
@@ -32,11 +34,11 @@ constructor(
             }
 
             is UpdateAccountPropertiesEvent -> {
-
+                performUpdateAccountProperties(stateEvent)
             }
 
             is ChangePasswordEvent -> {
-
+                performChangePassword(stateEvent)
             }
 
             is None -> {
@@ -80,6 +82,12 @@ constructor(
     private fun performGetAccountProperties(stateEvent: GetAccountPropertiesEvent) {
         initNewJob()
 
+        if (sessionManager.getId() == null) {
+            _dataState.value =
+                DataState.error(response = Response("No active user", ResponseType.Dialog))
+            return
+        }
+
         var result: DataState<AccountViewState>
 
         coroutineScope.launch {
@@ -110,6 +118,89 @@ constructor(
                 }
 
                 _dataState.value = accountRepository.getAccountPropertiesFromDatabase(id)
+            }
+        }
+    }
+
+    private fun performUpdateAccountProperties(stateEvent: UpdateAccountPropertiesEvent) {
+        initNewJob()
+
+        if (sessionManager.getId() == null) {
+            _dataState.value =
+                DataState.error(response = Response("No active user", ResponseType.Dialog))
+            return
+        }
+
+        var result: DataState<AccountViewState>
+
+        coroutineScope.launch {
+            sessionManager.getId()?.let { id ->
+
+                if (!sessionManager.isConnectedToTheInternet()) {
+                    _dataState.value = DataState.error(Response("Can't do that operation without internet", ResponseType.Dialog))
+                    return@launch
+                }
+
+                _dataState.value = DataState.loading(true)
+
+                result = accountRepository.saveAccountProperties(
+                    AccountProperties(
+                        id,
+                        stateEvent.email,
+                        stateEvent.username
+                    )
+                )
+
+                result.data?.data?.let { event ->
+                    event.peekContent().accountProperties?.let { accountProp ->
+                        accountRepository.updateLocalDatabase(
+                            accountProp.pk,
+                            accountProp.email,
+                            accountProp.username
+                        )
+                    }
+                }
+
+                _dataState.value = result
+            }
+        }
+
+    }
+
+    private fun performChangePassword(stateEvent: ChangePasswordEvent) {
+        initNewJob()
+
+        if (sessionManager.getCurrentUser() == null) {
+            _dataState.value =
+                DataState.error(response = Response("No active user", ResponseType.Dialog))
+            return
+        }
+
+        var result: DataState<AccountViewState>
+
+        coroutineScope.launch {
+            sessionManager.getCurrentUser()?.let { user ->
+                result = DataState.error(Response("Error occurred", ResponseType.Toast))
+
+                if (!stateEvent.newPassword.equals(stateEvent.confirmNewPassword)){
+                    _dataState.value = DataState.error(Response("Passwords must match", ResponseType.Dialog))
+                    return@launch
+                }
+
+                if (stateEvent.newPassword.equals(stateEvent.currentPassword) || stateEvent.confirmNewPassword.equals(stateEvent.currentPassword)){
+                    _dataState.value = DataState.error(Response("New and old password must be different", ResponseType.Dialog))
+                }
+
+                if (!sessionManager.isConnectedToTheInternet()) {
+                    _dataState.value = DataState.error(Response("Can't do that operation without internet", ResponseType.Dialog))
+                    return@launch
+                }
+
+                _dataState.value = DataState.loading(true, null)
+
+                result = accountRepository.updatePassword(stateEvent.currentPassword, stateEvent.newPassword)
+
+                _dataState.value = result
             }
         }
     }

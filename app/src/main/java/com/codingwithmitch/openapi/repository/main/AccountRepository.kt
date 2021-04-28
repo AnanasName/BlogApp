@@ -25,6 +25,19 @@ constructor(
         return mainService.getAccountProperties(id)
     }
 
+    suspend fun saveAccountProperties(
+        accountProperties: AccountProperties
+    ): DataState<AccountViewState>{
+        return mainService.saveAccountProperties(accountProperties)
+    }
+
+    suspend fun updatePassword(
+        oldPassword: String,
+        newPassword: String
+    ): DataState<AccountViewState>{
+        return mainService.changePassword(sessionManager.getCurrentUser()!!.email!!, oldPassword, newPassword, sessionManager.getCurrentUser()!!)
+    }
+
     suspend fun getAccountPropertiesFromDatabase(
         id: String
     ): DataState<AccountViewState> {
