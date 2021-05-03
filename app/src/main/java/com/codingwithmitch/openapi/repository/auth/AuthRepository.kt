@@ -1,23 +1,15 @@
 package com.codingwithmitch.openapi.repository.auth
 
-import android.content.SharedPreferences
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.codingwithmitch.openapi.api.auth.AuthService
-import com.codingwithmitch.openapi.di.auth.state.AuthViewState
-import com.codingwithmitch.openapi.di.auth.state.LoginFields
-import com.codingwithmitch.openapi.di.auth.state.RegistrationFields
-import com.codingwithmitch.openapi.di.auth.state.ResetPasswordFields
-import com.codingwithmitch.openapi.models.AccountProperties
-import com.codingwithmitch.openapi.persistence.AccountPropertiesDao
-import com.codingwithmitch.openapi.repository.util.safeApiCall
+import com.codingwithmitch.openapi.ui.auth.state.AuthViewState
+import com.codingwithmitch.openapi.ui.auth.state.LoginFields
+import com.codingwithmitch.openapi.ui.auth.state.RegistrationFields
+import com.codingwithmitch.openapi.ui.auth.state.ResetPasswordFields
 import com.codingwithmitch.openapi.session.SessionManager
 import com.codingwithmitch.openapi.ui.DataState
+import com.codingwithmitch.openapi.repository.JobManager
 import com.codingwithmitch.openapi.ui.Response
 import com.codingwithmitch.openapi.ui.ResponseType
-import kotlinx.coroutines.*
-import kotlinx.coroutines.Dispatchers.IO
 import javax.inject.Inject
 
 class AuthRepository
@@ -25,7 +17,7 @@ class AuthRepository
 constructor(
     val authService: AuthService,
     val sessionManager: SessionManager
-) {
+) : JobManager("AuthRepository") {
 
     suspend fun attemptRegister(
         email: String,

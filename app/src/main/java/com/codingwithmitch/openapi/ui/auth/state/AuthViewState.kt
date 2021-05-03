@@ -1,4 +1,4 @@
-package com.codingwithmitch.openapi.di.auth.state
+package com.codingwithmitch.openapi.ui.auth.state
 
 import com.codingwithmitch.openapi.models.AuthToken
 

@@ -1,4 +1,4 @@
-package com.codingwithmitch.openapi.di.auth.state
+package com.codingwithmitch.openapi.ui.auth.state
 
 sealed class AuthStateEvent {
 
@@ -19,5 +19,7 @@ sealed class AuthStateEvent {
     ): AuthStateEvent()
 
     object CheckPreviousAuthEvent : AuthStateEvent()
+
+    object None : AuthStateEvent()
 
 }

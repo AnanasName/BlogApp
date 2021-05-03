@@ -1,18 +1,16 @@
 package com.codingwithmitch.openapi.ui.auth
 
-import android.util.Log
 import androidx.lifecycle.*
-import com.codingwithmitch.openapi.di.auth.state.*
-import com.codingwithmitch.openapi.di.auth.state.AuthStateEvent.*
+import com.codingwithmitch.openapi.ui.auth.state.*
+import com.codingwithmitch.openapi.ui.auth.state.AuthStateEvent.*
 import com.codingwithmitch.openapi.models.AuthToken
 import com.codingwithmitch.openapi.repository.auth.AuthRepository
-import com.codingwithmitch.openapi.repository.util.safeApiCall
 import com.codingwithmitch.openapi.ui.BaseViewModel
 import com.codingwithmitch.openapi.ui.DataState
+import com.codingwithmitch.openapi.ui.Response
+import com.codingwithmitch.openapi.ui.ResponseType
 import com.codingwithmitch.openapi.util.AbsentLiveData
 import kotlinx.coroutines.*
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
 import javax.inject.Inject
 
 class AuthViewModel
@@ -20,9 +18,6 @@ class AuthViewModel
 constructor(
     private val authRepository: AuthRepository
 ) : BaseViewModel<AuthStateEvent, AuthViewState>() {
-
-    private var job: CompletableJob = Job()
-    lateinit var coroutineScope: CoroutineScope
 
     override fun handleStateEvent(stateEvent: AuthStateEvent){
         when (stateEvent) {
@@ -41,6 +36,10 @@ constructor(
 
             is CheckPreviousAuthEvent -> {
                 _dataState.value = null
+            }
+
+            is None -> {
+                _dataState.value = DataState.data(null, Response(null, ResponseType.None))
             }
         }
     }
@@ -81,15 +80,14 @@ constructor(
         _viewState.value = update
     }
 
-    private fun initNewJob() {
-        job = Job()
-        coroutineScope = CoroutineScope(viewModelScope.coroutineContext + job)
-    }
-
     fun cancelJobs() {
-        job.cancel()
+        handlePendingData()
+        authRepository.cancelActiveJobs()
     }
 
+    fun handlePendingData(){
+        setStateEvent(None)
+    }
 
     override fun onCleared() {
         super.onCleared()
@@ -100,6 +98,8 @@ constructor(
         _dataState.value = DataState.loading(true, null)
 
         initNewJob()
+
+        authRepository.addJob("performLogin", job)
 
         var result: DataState<AuthViewState>?
 
@@ -113,6 +113,8 @@ constructor(
     private fun performRegister(stateEvent: RegisterAttemptEvent){
 
         initNewJob()
+
+        authRepository.addJob("performRegister", job)
 
         var result: DataState<AuthViewState>?
         coroutineScope.launch {
@@ -130,7 +132,10 @@ constructor(
     }
 
     private fun performResetPassword(stateEvent: ResetPasswordAttemptEvent){
+
         initNewJob()
+
+        authRepository.addJob("performResetPassword", job)
 
         var result: DataState<AuthViewState>?
         coroutineScope.launch {

@@ -9,10 +9,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.firestore.FirebaseFirestoreException
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.*
 import retrofit2.HttpException
 import java.io.IOException
 import kotlin.coroutines.CoroutineContext
@@ -92,6 +89,10 @@ suspend fun <T> safeApiCall(
                         ResponseType.Dialog
                     )
                 )
+            }
+
+            is CancellationException -> {
+                DataState.data(null, Response("Changes canceled", ResponseType.Toast))
             }
             else -> {
                 Log.d("DEBUG", throwable.message)

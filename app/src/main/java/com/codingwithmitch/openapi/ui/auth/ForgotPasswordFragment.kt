@@ -1,14 +1,13 @@
 package com.codingwithmitch.openapi.ui.auth
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import com.codingwithmitch.openapi.R
-import com.codingwithmitch.openapi.di.auth.state.AuthStateEvent
-import com.codingwithmitch.openapi.di.auth.state.ResetPasswordFields
+import com.codingwithmitch.openapi.ui.auth.state.AuthStateEvent
+import com.codingwithmitch.openapi.ui.auth.state.ResetPasswordFields
 import kotlinx.android.synthetic.main.fragment_forgot_password.*
 
 class ForgotPasswordFragment : BaseAuthFragment() {

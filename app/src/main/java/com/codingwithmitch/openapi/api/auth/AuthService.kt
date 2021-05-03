@@ -1,9 +1,8 @@
 package com.codingwithmitch.openapi.api.auth
 
 import android.content.SharedPreferences
-import android.util.Log
 import com.codingwithmitch.openapi.di.auth.AuthScope
-import com.codingwithmitch.openapi.di.auth.state.AuthViewState
+import com.codingwithmitch.openapi.ui.auth.state.AuthViewState
 import com.codingwithmitch.openapi.models.AccountProperties
 import com.codingwithmitch.openapi.models.AuthToken
 import com.codingwithmitch.openapi.persistence.AccountPropertiesDao
@@ -13,11 +12,7 @@ import com.codingwithmitch.openapi.ui.Response
 import com.codingwithmitch.openapi.ui.ResponseType
 import com.codingwithmitch.openapi.util.PreferencesKeys
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.*
-import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.tasks.await
 import java.util.*
 import javax.inject.Inject

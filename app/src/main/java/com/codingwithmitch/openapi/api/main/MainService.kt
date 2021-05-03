@@ -2,21 +2,23 @@ package com.codingwithmitch.openapi.api.main
 
 import android.util.Log
 import com.codingwithmitch.openapi.api.auth.USERS_COLLECTION
-import com.codingwithmitch.openapi.di.auth.state.AuthViewState
 import com.codingwithmitch.openapi.models.AccountProperties
-import com.codingwithmitch.openapi.models.AuthToken
+import com.codingwithmitch.openapi.models.BlogPost
 import com.codingwithmitch.openapi.repository.util.safeApiCall
 import com.codingwithmitch.openapi.ui.DataState
 import com.codingwithmitch.openapi.ui.Response
 import com.codingwithmitch.openapi.ui.ResponseType
 import com.codingwithmitch.openapi.ui.main.account.state.AccountViewState
+import com.codingwithmitch.openapi.ui.main.blog.state.BlogViewState
+import com.codingwithmitch.openapi.ui.main.blog.state.BlogViewState.*
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.toObjects
 import kotlinx.coroutines.tasks.await
-import java.util.*
 
 const val CHANGES_APPLIED = "Changes applied"
+const val BLOG_POSTS_COLLECTION = "blog_posts"
 
 class MainService(
     private val firebaseFirestore: FirebaseFirestore
@@ -99,8 +101,8 @@ class MainService(
 
             user
                 .reauthenticate(credential)
-                .addOnCompleteListener{
-                   isCorrectionInfo = true
+                .addOnCompleteListener {
+                    isCorrectionInfo = true
                 }.await()
 
             if (isCorrectionInfo) {
@@ -113,6 +115,77 @@ class MainService(
             }
 
             result
+        }
+    }
+
+    suspend fun searchBlogPosts(
+        query: String
+    ): DataState<BlogViewState> {
+        return safeApiCall {
+
+            val queryList: List<BlogPost>
+
+            var result: DataState<BlogViewState> =
+                DataState.error(Response("Error occurred", ResponseType.Dialog))
+
+            var hasErrors = false
+
+            val blogList = firebaseFirestore
+                .collection(BLOG_POSTS_COLLECTION)
+                .get()
+                .addOnFailureListener {
+                    hasErrors = true
+                    result = DataState.error(Response(it.message, ResponseType.Dialog))
+                }
+                .await()
+                .toObjects(BlogPost::class.java)
+
+            if (!hasErrors) {
+                queryList = sortResultWithQuery(query, blogList)
+                result = DataState.data(
+                    BlogViewState(BlogFields(queryList, query)),
+                    Response("Data retrieved success", ResponseType.None)
+                )
+            }
+
+
+            result
+        }
+    }
+
+    suspend fun getAllBlogPosts(): DataState<BlogViewState> {
+        return safeApiCall {
+
+            var result: DataState<BlogViewState> =
+                DataState.error(Response("Error occurred", ResponseType.Dialog))
+
+            var hasErrors = false
+
+            val blogList = firebaseFirestore
+                .collection(BLOG_POSTS_COLLECTION)
+                .get()
+                .addOnFailureListener {
+                    hasErrors = true
+                    result = DataState.error(Response(it.message, ResponseType.Dialog))
+                }
+                .await()
+                .toObjects(BlogPost::class.java)
+
+            if (!hasErrors) {
+                result = DataState.data(
+                    BlogViewState(BlogFields(blogList)),
+                    Response("Data retrieved success", ResponseType.None)
+                )
+                Log.d("DEBUG", result.data.toString())
+            }
+
+            result
+        }
+    }
+
+    private fun sortResultWithQuery(query: String, blogList: List<BlogPost>): List<BlogPost> {
+        return blogList.filter {
+            it.body.contains(query) || it.title.contains(query) || it.username.contains(query)
         }
     }
 

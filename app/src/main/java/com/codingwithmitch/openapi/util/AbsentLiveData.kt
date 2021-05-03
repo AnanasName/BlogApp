@@ -1,6 +1,8 @@
 package com.codingwithmitch.openapi.util
 
 import androidx.lifecycle.LiveData
+import com.codingwithmitch.openapi.ui.DataState
+import com.codingwithmitch.openapi.ui.auth.state.AuthViewState
 
 class AbsentLiveData <T : Any?>
 private constructor(): LiveData<T>()
@@ -11,7 +13,7 @@ private constructor(): LiveData<T>()
     }
 
     companion object{
-        fun <T> create(): LiveData<T>{
+        fun <T> create(): LiveData<T>? {
             return AbsentLiveData()
         }
     }

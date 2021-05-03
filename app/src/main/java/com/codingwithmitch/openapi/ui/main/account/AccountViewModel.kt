@@ -9,9 +9,11 @@ import com.codingwithmitch.openapi.ui.BaseViewModel
 import com.codingwithmitch.openapi.ui.DataState
 import com.codingwithmitch.openapi.ui.Response
 import com.codingwithmitch.openapi.ui.ResponseType
+import com.codingwithmitch.openapi.ui.auth.state.AuthStateEvent
 import com.codingwithmitch.openapi.ui.main.account.state.AccountStateEvent
 import com.codingwithmitch.openapi.ui.main.account.state.AccountStateEvent.*
 import com.codingwithmitch.openapi.ui.main.account.state.AccountViewState
+import com.codingwithmitch.openapi.util.AbsentLiveData
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
 import javax.inject.Inject
@@ -22,9 +24,6 @@ constructor(
     val sessionManager: SessionManager,
     val accountRepository: AccountRepository
 ) : BaseViewModel<AccountStateEvent, AccountViewState>() {
-
-    private var job: CompletableJob = Job()
-    lateinit var coroutineScope: CoroutineScope
 
     override fun handleStateEvent(stateEvent: AccountStateEvent) {
         when (stateEvent) {
@@ -42,18 +41,13 @@ constructor(
             }
 
             is None -> {
-
+                _dataState.value = DataState.data(AccountViewState(), Response(null, ResponseType.None))
             }
         }
     }
 
     override fun initViewState(): AccountViewState {
         return AccountViewState()
-    }
-
-    private fun initNewJob() {
-        job = Job()
-        coroutineScope = CoroutineScope(viewModelScope.coroutineContext + job)
     }
 
     fun setAccountPropertiesData(accountProperties: AccountProperties) {
@@ -70,9 +64,13 @@ constructor(
     }
 
     fun cancelJobs() {
-        job.cancel()
+        handlePendingData()
+        accountRepository.cancelActiveJobs()
     }
 
+    fun handlePendingData(){
+        setStateEvent(None)
+    }
 
     override fun onCleared() {
         super.onCleared()
@@ -81,6 +79,8 @@ constructor(
 
     private fun performGetAccountProperties(stateEvent: GetAccountPropertiesEvent) {
         initNewJob()
+
+        accountRepository.addJob("performGetAccountProperties", job)
 
         if (sessionManager.getId() == null) {
             _dataState.value =
@@ -124,6 +124,8 @@ constructor(
 
     private fun performUpdateAccountProperties(stateEvent: UpdateAccountPropertiesEvent) {
         initNewJob()
+
+        accountRepository.addJob("performUpdateAccountProperties", job)
 
         if (sessionManager.getId() == null) {
             _dataState.value =
@@ -169,6 +171,8 @@ constructor(
 
     private fun performChangePassword(stateEvent: ChangePasswordEvent) {
         initNewJob()
+
+        accountRepository.addJob("performChangePassword", job)
 
         if (sessionManager.getCurrentUser() == null) {
             _dataState.value =

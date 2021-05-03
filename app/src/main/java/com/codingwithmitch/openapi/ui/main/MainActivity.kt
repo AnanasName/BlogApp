@@ -9,10 +9,13 @@ import androidx.navigation.NavController
 import com.codingwithmitch.openapi.R
 import com.codingwithmitch.openapi.ui.BaseActivity
 import com.codingwithmitch.openapi.ui.auth.AuthActivity
+import com.codingwithmitch.openapi.ui.main.account.BaseAccountFragment
 import com.codingwithmitch.openapi.ui.main.account.ChangePasswordFragment
 import com.codingwithmitch.openapi.ui.main.account.UpdateAccountFragment
+import com.codingwithmitch.openapi.ui.main.blog.BaseBlogFragment
 import com.codingwithmitch.openapi.ui.main.blog.UpdateBlogFragment
 import com.codingwithmitch.openapi.ui.main.blog.ViewBlogFragment
+import com.codingwithmitch.openapi.ui.main.create_blog.BaseCreateBlogFragment
 import com.codingwithmitch.openapi.util.BottomNavController
 import com.codingwithmitch.openapi.util.BottomNavController.*
 import com.codingwithmitch.openapi.util.setupNavigation
@@ -55,8 +58,9 @@ class MainActivity : BaseActivity(),
         subscribeObservers()
 
         checkIsLogged()
-
     }
+
+
 
     private fun checkIsLogged() {
         if (!sessionManager.isLogged())
@@ -128,6 +132,25 @@ class MainActivity : BaseActivity(),
 
     override fun onGraphChange() {
         expandAppbar()
+        cancelActiveJobs()
+    }
+
+    private fun cancelActiveJobs(){
+        val fragments = bottomNavController.fragmentManager
+            .findFragmentById(bottomNavController.containerId)
+            ?.childFragmentManager
+            ?.fragments
+
+        if (fragments != null){
+            for (fragment in fragments){
+                when(fragment){
+                    is BaseBlogFragment -> fragment.cancelActiveJobs()
+                    is BaseAccountFragment -> fragment.cancelActiveJobs()
+                    is BaseCreateBlogFragment -> fragment.cancelActiveJobs()
+                }
+            }
+        }
+        displayProgressBar(false)
     }
 
     override fun onReselectItem(navController: NavController, fragment: Fragment) = when(fragment){

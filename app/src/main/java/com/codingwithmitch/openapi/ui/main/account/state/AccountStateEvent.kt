@@ -15,5 +15,5 @@ sealed class AccountStateEvent {
         val confirmNewPassword: String
     ): AccountStateEvent()
 
-    class None: AccountStateEvent()
+    object None : AccountStateEvent()
 }

@@ -1,11 +1,11 @@
 package com.codingwithmitch.openapi.repository.main
 
-import android.util.Log
 import com.codingwithmitch.openapi.api.main.MainService
 import com.codingwithmitch.openapi.models.AccountProperties
 import com.codingwithmitch.openapi.persistence.AccountPropertiesDao
 import com.codingwithmitch.openapi.session.SessionManager
 import com.codingwithmitch.openapi.ui.DataState
+import com.codingwithmitch.openapi.repository.JobManager
 import com.codingwithmitch.openapi.ui.Response
 import com.codingwithmitch.openapi.ui.ResponseType
 import com.codingwithmitch.openapi.ui.main.account.state.AccountViewState
@@ -17,7 +17,7 @@ constructor(
     private val mainService: MainService,
     private val accountPropertiesDao: AccountPropertiesDao,
     private val sessionManager: SessionManager
-) {
+) : JobManager("AccountRepository") {
 
     suspend fun getAccountProperties(
         id: String
