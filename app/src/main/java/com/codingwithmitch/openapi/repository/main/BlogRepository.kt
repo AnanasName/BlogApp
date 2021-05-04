@@ -20,8 +20,9 @@ constructor(
     suspend fun searchBlogPosts(
         query: String?
     ): DataState<BlogViewState> {
-        if (query.isNullOrBlank())
+        if (query.isNullOrBlank()) {
             return mainService.getAllBlogPosts()
+        }
 
         return mainService.searchBlogPosts(query)
     }

@@ -4,5 +4,7 @@ sealed class BlogStateEvent {
 
     object BlogSearchEvent : BlogStateEvent()
 
+    object CheckAuthorOfBlogPost : BlogStateEvent()
+
     object None : BlogStateEvent()
 }

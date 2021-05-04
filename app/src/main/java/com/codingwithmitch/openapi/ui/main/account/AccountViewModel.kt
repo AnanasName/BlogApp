@@ -107,6 +107,8 @@ constructor(
 
                 result = accountRepository.getAccountProperties(id)
 
+
+
                 result.data?.data?.let { event ->
                     event.peekContent().accountProperties?.let { accountProp ->
                         accountRepository.updateLocalDatabase(
@@ -117,7 +119,12 @@ constructor(
                     }
                 }
 
-                _dataState.value = accountRepository.getAccountPropertiesFromDatabase(id)
+                val data = accountRepository.getAccountPropertiesFromDatabase(id)
+
+                if (data.data?.data?.peekContent()?.accountProperties == null)
+                    Log.d("DEBUG", "Here")
+
+                _dataState.value = data
             }
         }
     }

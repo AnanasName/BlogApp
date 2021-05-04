@@ -25,4 +25,7 @@ interface BlogPostDao {
         query: String
     ): List<BlogPost>
 
+    @Query("DELETE FROM blog_post")
+    suspend fun deleteAllBlogPosts()
+
 }

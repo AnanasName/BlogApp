@@ -1,5 +1,7 @@
 package com.codingwithmitch.openapi.ui.main.blog
 
+import androidx.recyclerview.widget.RecyclerView
+import com.codingwithmitch.openapi.ui.main.blog.BlogListAdapter
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -8,11 +10,21 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.RequestManager
 import com.codingwithmitch.openapi.R
+import com.codingwithmitch.openapi.models.BlogPost
 import com.codingwithmitch.openapi.ui.main.blog.state.BlogStateEvent
+import com.codingwithmitch.openapi.util.TopSpacingItemDecoration
 import kotlinx.android.synthetic.main.fragment_blog.*
+import javax.inject.Inject
 
-class BlogFragment : BaseBlogFragment() {
+class BlogFragment : BaseBlogFragment(),
+    BlogListAdapter.Interaction
+{
+
+
+    private lateinit var recyclerAdapter: BlogListAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -25,12 +37,13 @@ class BlogFragment : BaseBlogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        goViewBlogFragment.setOnClickListener{
-            findNavController().navigate(R.id.action_blogFragment_to_viewBlogFragment)
-        }
+//        goViewBlogFragment.setOnClickListener{
+//            findNavController().navigate(R.id.action_blogFragment_to_viewBlogFragment)
+//        }
 
         subscribeObservers()
         executeSearch()
+        initRecyclerView()
     }
 
     private fun executeSearch(){
@@ -56,6 +69,46 @@ class BlogFragment : BaseBlogFragment() {
 
         viewModel.viewState.observe(viewLifecycleOwner, Observer { viewState ->
             Log.d("DEBUG", "BlogFragment: viewState: ${viewState}")
+            if (viewState != null){
+                recyclerAdapter.submitList(
+                    viewState.blogFields.blogList,
+                    isQueryExhausted = true
+                )
+            }
         })
+    }
+
+    private fun initRecyclerView(){
+        blog_post_recyclerview.apply {
+            layoutManager = LinearLayoutManager(this@BlogFragment.context)
+            val topSpacingItemDecoration = TopSpacingItemDecoration(30)
+            removeItemDecoration(topSpacingItemDecoration)
+            addItemDecoration(topSpacingItemDecoration)
+            recyclerAdapter = BlogListAdapter(
+                this@BlogFragment,
+                requestManager
+            )
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                    val lastPosition  = layoutManager.findLastVisibleItemPosition()
+                    if (lastPosition == recyclerAdapter.itemCount.minus(1)){
+
+                    }
+                }
+            })
+            adapter = recyclerAdapter
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        blog_post_recyclerview.adapter = null
+    }
+
+    override fun onItemSelected(position: Int, item: BlogPost) {
+        viewModel.setBlogPost(item)
+        findNavController().navigate(R.id.action_blogFragment_to_viewBlogFragment)
     }
 }

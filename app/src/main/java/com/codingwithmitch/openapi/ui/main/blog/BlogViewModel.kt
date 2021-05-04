@@ -12,12 +12,14 @@ import com.codingwithmitch.openapi.ui.Response
 import com.codingwithmitch.openapi.ui.ResponseType
 import com.codingwithmitch.openapi.ui.main.account.state.AccountViewState
 import com.codingwithmitch.openapi.ui.main.blog.state.BlogStateEvent
+import com.codingwithmitch.openapi.ui.main.blog.state.BlogStateEvent.*
 import com.codingwithmitch.openapi.ui.main.blog.state.BlogViewState
 import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.reflect.jvm.internal.impl.util.Check
 
 class BlogViewModel
 @Inject
@@ -35,11 +37,15 @@ constructor(
     override fun handleStateEvent(stateEvent: BlogStateEvent) {
         when (stateEvent) {
 
-            is BlogStateEvent.BlogSearchEvent -> {
+            is BlogSearchEvent -> {
                 performGetBlogPosts(stateEvent)
             }
 
-            is BlogStateEvent.None -> {
+            is CheckAuthorOfBlogPost -> {
+
+            }
+
+            is None -> {
 
             }
         }
@@ -59,13 +65,25 @@ constructor(
         _viewState.value = update
     }
 
+    fun setBlogPost(blogPost: BlogPost){
+        val update = getCurrentViewStateOrNew()
+        update.viewBlogFields.blogPost = blogPost
+        _viewState.value = update
+    }
+
+    fun setIsAuthorOfBlogPost(isAuthorBlogPost: Boolean){
+        val update = getCurrentViewStateOrNew()
+        update.viewBlogFields.isAuthorOfBlogPost = isAuthorBlogPost
+        _viewState.value = update
+    }
+
     fun cancelActiveJobs() {
         blogRepository.cancelActiveJobs()
         handlePendingData()
     }
 
     private fun handlePendingData() {
-        setStateEvent(BlogStateEvent.None)
+        setStateEvent(None)
     }
 
     override fun onCleared() {
@@ -73,7 +91,7 @@ constructor(
         cancelActiveJobs()
     }
 
-    private fun performGetBlogPosts(stateEvent: BlogStateEvent.BlogSearchEvent) {
+    private fun performGetBlogPosts(stateEvent: BlogSearchEvent) {
         initNewJob()
 
         blogRepository.addJob("performGetBlogPosts", job)
