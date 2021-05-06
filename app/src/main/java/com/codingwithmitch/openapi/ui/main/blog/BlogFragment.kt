@@ -66,8 +66,8 @@ class BlogFragment : BaseBlogFragment(),
             Log.d("DEBUG", "BlogFragment: viewState: ${viewState}")
             if (viewState != null){
                 recyclerAdapter.submitList(
-                    viewState.blogFields.blogList,
-                    isQueryExhausted = viewModel.getIsQueryExhausted()
+                    list = viewState.blogFields.blogList,
+                    isQueryExhausted = viewState.blogFields.isQueryExhausted
                 )
             }
         })

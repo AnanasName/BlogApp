@@ -176,7 +176,6 @@ class MainService(
                     BlogViewState(BlogFields(blogList)),
                     Response("Data retrieved success", ResponseType.None)
                 )
-                Log.d("DEBUG", result.data.toString())
             }
 
             result

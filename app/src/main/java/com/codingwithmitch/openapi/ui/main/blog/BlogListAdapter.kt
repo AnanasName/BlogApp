@@ -1,5 +1,6 @@
 package com.codingwithmitch.openapi.ui.main.blog
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -117,8 +118,10 @@ class BlogListAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        if (differ.currentList[position].pk.equals(NO_MORE_RESULT))
+        if (differ.currentList[position].pk.equals(NO_MORE_RESULT.toString())) {
+            Log.d("SOMETHING", "Yep")
             return NO_MORE_RESULT
+        }
         return BLOG_ITEM
     }
 
@@ -127,7 +130,7 @@ class BlogListAdapter(
         if (isQueryExhausted){
             newList?.add(NO_MORE_RESULTS_BLOG_MARKER)
         }
-        differ.submitList(list)
+        differ.submitList(newList)
     }
 
     class BlogViewHolder

@@ -1,6 +1,7 @@
 package com.codingwithmitch.openapi.ui.main.blog.viewmodel
 
 import android.content.SharedPreferences
+import android.util.Log
 import com.bumptech.glide.RequestManager
 import com.codingwithmitch.openapi.models.BlogPost
 import com.codingwithmitch.openapi.repository.main.BlogRepository
@@ -96,9 +97,18 @@ constructor(
             cachingData = blogRepository.getBlogPostsFromDatabase(getSearchQuery(), getPage())
             setQueryInProgress(false)
 
-            _dataState.value = DataState.data(BlogViewState(BlogViewState.BlogFields(cachingData)), Response("Data retrieved success", ResponseType.None))
-            if (getPage() * PAGINATION_PAGE_SIZE > viewState.value!!.blogFields.blogList.size)
-                setQueryExhausted(true)
+            if (getPage() * PAGINATION_PAGE_SIZE > viewState.value!!.blogFields.blogList.size) {
+                _dataState.value = DataState.data(
+                    BlogViewState(
+                        BlogViewState.BlogFields(
+                            cachingData,
+                            isQueryExhausted = true
+                        )
+                    ), Response("Data retrieved success", ResponseType.None)
+                )
+            }
+            else
+                _dataState.value = DataState.data(BlogViewState(BlogViewState.BlogFields(cachingData, isQueryExhausted = false)), Response("Data retrieved success", ResponseType.None))
         }
     }
 
