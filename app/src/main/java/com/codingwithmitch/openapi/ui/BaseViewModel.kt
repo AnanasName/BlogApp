@@ -28,6 +28,10 @@ abstract class BaseViewModel<StateEvent, ViewState> : ViewModel() {
         }
     }
 
+    fun setViewState(viewState: ViewState){
+        _viewState.value = viewState
+    }
+
     protected fun initNewJob() {
         job = Job()
         coroutineScope = CoroutineScope(viewModelScope.coroutineContext + job)

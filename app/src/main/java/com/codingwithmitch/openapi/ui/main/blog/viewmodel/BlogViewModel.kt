@@ -1,25 +1,20 @@
-package com.codingwithmitch.openapi.ui.main.blog
+package com.codingwithmitch.openapi.ui.main.blog.viewmodel
 
 import android.content.SharedPreferences
 import com.bumptech.glide.RequestManager
 import com.codingwithmitch.openapi.models.BlogPost
-import com.codingwithmitch.openapi.persistence.BlogPostDao
 import com.codingwithmitch.openapi.repository.main.BlogRepository
 import com.codingwithmitch.openapi.session.SessionManager
 import com.codingwithmitch.openapi.ui.BaseViewModel
 import com.codingwithmitch.openapi.ui.DataState
 import com.codingwithmitch.openapi.ui.Response
 import com.codingwithmitch.openapi.ui.ResponseType
-import com.codingwithmitch.openapi.ui.main.account.state.AccountViewState
 import com.codingwithmitch.openapi.ui.main.blog.state.BlogStateEvent
 import com.codingwithmitch.openapi.ui.main.blog.state.BlogStateEvent.*
 import com.codingwithmitch.openapi.ui.main.blog.state.BlogViewState
-import kotlinx.coroutines.CompletableJob
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
+import com.codingwithmitch.openapi.util.Constants.Companion.PAGINATION_PAGE_SIZE
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.reflect.jvm.internal.impl.util.Check
 
 class BlogViewModel
 @Inject
@@ -46,35 +41,9 @@ constructor(
             }
 
             is None -> {
-
+                _dataState.value = DataState.data(null, Response(null, ResponseType.None))
             }
         }
-    }
-
-    fun setQuery(query: String) {
-        val update = getCurrentViewStateOrNew()
-//        if (query.equals(update.blogFields.searchQuery))
-//            return
-        update.blogFields.searchQuery = query
-        _viewState.value = update
-    }
-
-    fun setBlogListData(blogList: List<BlogPost>) {
-        val update = getCurrentViewStateOrNew()
-        update.blogFields.blogList = blogList
-        _viewState.value = update
-    }
-
-    fun setBlogPost(blogPost: BlogPost){
-        val update = getCurrentViewStateOrNew()
-        update.viewBlogFields.blogPost = blogPost
-        _viewState.value = update
-    }
-
-    fun setIsAuthorOfBlogPost(isAuthorBlogPost: Boolean){
-        val update = getCurrentViewStateOrNew()
-        update.viewBlogFields.isAuthorOfBlogPost = isAuthorBlogPost
-        _viewState.value = update
     }
 
     fun cancelActiveJobs() {
@@ -99,8 +68,8 @@ constructor(
         var result: DataState<BlogViewState>
 
         coroutineScope.launch {
-            var cachingData = blogRepository.getBlogPostsFromDatabase(viewState.value!!.blogFields.searchQuery)
-            result = DataState.data(BlogViewState(BlogViewState.BlogFields(cachingData, viewState.value!!.blogFields.searchQuery)), Response("Data retrieved success", ResponseType.None))
+            var cachingData = blogRepository.getBlogPostsFromDatabase(getSearchQuery(), getPage())
+            result = DataState.data(BlogViewState(BlogViewState.BlogFields(cachingData, getSearchQuery())), Response("Data retrieved success", ResponseType.None))
 
             if (!sessionManager.isConnectedToTheInternet()) {
                 _dataState.value = result
@@ -113,7 +82,7 @@ constructor(
                 }
             }
 
-            result = blogRepository.searchBlogPosts(viewState.value!!.blogFields.searchQuery)
+            result = blogRepository.searchBlogPosts(getSearchQuery())
 
             result.data?.data?.let { event ->
                 event.peekContent().blogFields.blogList.forEach { blogPost ->
@@ -123,9 +92,13 @@ constructor(
                 }
             }
 
-            cachingData = blogRepository.getBlogPostsFromDatabase(viewState.value!!.blogFields.searchQuery)
+            setQueryInProgress(true)
+            cachingData = blogRepository.getBlogPostsFromDatabase(getSearchQuery(), getPage())
+            setQueryInProgress(false)
 
             _dataState.value = DataState.data(BlogViewState(BlogViewState.BlogFields(cachingData)), Response("Data retrieved success", ResponseType.None))
+            if (getPage() * PAGINATION_PAGE_SIZE > viewState.value!!.blogFields.blogList.size)
+                setQueryExhausted(true)
         }
     }
 

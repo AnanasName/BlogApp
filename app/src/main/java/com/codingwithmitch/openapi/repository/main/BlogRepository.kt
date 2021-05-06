@@ -28,13 +28,14 @@ constructor(
     }
 
     suspend fun getBlogPostsFromDatabase(
-        query: String?
+        query: String?,
+        page: Int
     ): List<BlogPost> {
 
         if (query.isNullOrBlank())
-            return blogPostDao.getAllBlogPosts()
+            return blogPostDao.getAllBlogPosts(page)
 
-        return blogPostDao.searchBlogPosts(query)
+        return blogPostDao.searchBlogPosts(query, page)
     }
 
     suspend fun insertBlogPostToDatabase(
