@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import android.util.Log
 import com.bumptech.glide.RequestManager
 import com.codingwithmitch.openapi.models.BlogPost
+import com.codingwithmitch.openapi.persistence.BlogQueryUtils
 import com.codingwithmitch.openapi.repository.main.BlogRepository
 import com.codingwithmitch.openapi.session.SessionManager
 import com.codingwithmitch.openapi.ui.BaseViewModel
@@ -14,6 +15,8 @@ import com.codingwithmitch.openapi.ui.main.blog.state.BlogStateEvent
 import com.codingwithmitch.openapi.ui.main.blog.state.BlogStateEvent.*
 import com.codingwithmitch.openapi.ui.main.blog.state.BlogViewState
 import com.codingwithmitch.openapi.util.Constants.Companion.PAGINATION_PAGE_SIZE
+import com.codingwithmitch.openapi.util.PreferencesKeys.Companion.BLOG_FILTER
+import com.codingwithmitch.openapi.util.PreferencesKeys.Companion.BLOG_ORDER
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,11 +26,35 @@ constructor(
     private val sessionManager: SessionManager,
     private val blogRepository: BlogRepository,
     private val sharedPreferences: SharedPreferences,
-    private val requestManager: RequestManager
+    private val editor: SharedPreferences.Editor
 ) : BaseViewModel<BlogStateEvent, BlogViewState>() {
+
+    init {
+        setBlogFilter(
+            sharedPreferences.getString(
+                BLOG_FILTER,
+                BlogQueryUtils.BLOG_FILTER_DATE_UPDATED
+            )
+        )
+
+        setBlogOrder(
+            sharedPreferences.getString(
+                BLOG_ORDER,
+                BlogQueryUtils.BLOG_ORDER_ASC
+            )
+        )
+    }
 
     override fun initViewState(): BlogViewState {
         return BlogViewState()
+    }
+
+    fun saveFilterOptions(filter: String, order: String){
+        editor.putString(BLOG_FILTER, filter)
+        editor.apply()
+
+        editor.putString(BLOG_ORDER, order)
+        editor.apply()
     }
 
     override fun handleStateEvent(stateEvent: BlogStateEvent) {
@@ -69,7 +96,7 @@ constructor(
         var result: DataState<BlogViewState>
 
         coroutineScope.launch {
-            var cachingData = blogRepository.getBlogPostsFromDatabase(getSearchQuery(), getPage())
+            var cachingData = blogRepository.getBlogPostsFromDatabase(getSearchQuery(), getPage(), getOrder() + getFilter())
             result = DataState.data(BlogViewState(BlogViewState.BlogFields(cachingData, getSearchQuery())), Response("Data retrieved success", ResponseType.None))
 
             if (!sessionManager.isConnectedToTheInternet()) {
@@ -94,7 +121,7 @@ constructor(
             }
 
             setQueryInProgress(true)
-            cachingData = blogRepository.getBlogPostsFromDatabase(getSearchQuery(), getPage())
+            cachingData = blogRepository.getBlogPostsFromDatabase(getSearchQuery(), getPage(), getOrder() + getFilter())
             setQueryInProgress(false)
 
             if (getPage() * PAGINATION_PAGE_SIZE > viewState.value!!.blogFields.blogList.size) {

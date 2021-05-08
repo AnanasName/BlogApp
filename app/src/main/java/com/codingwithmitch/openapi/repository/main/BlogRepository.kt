@@ -3,6 +3,7 @@ package com.codingwithmitch.openapi.repository.main
 import com.codingwithmitch.openapi.api.main.MainService
 import com.codingwithmitch.openapi.models.BlogPost
 import com.codingwithmitch.openapi.persistence.BlogPostDao
+import com.codingwithmitch.openapi.persistence.returnOrderedBlogQuery
 import com.codingwithmitch.openapi.repository.JobManager
 import com.codingwithmitch.openapi.session.SessionManager
 import com.codingwithmitch.openapi.ui.DataState
@@ -29,13 +30,14 @@ constructor(
 
     suspend fun getBlogPostsFromDatabase(
         query: String?,
-        page: Int
+        page: Int,
+        filterAndOrder: String
     ): List<BlogPost> {
 
         if (query.isNullOrBlank())
-            return blogPostDao.getAllBlogPosts(page)
+            return blogPostDao.returnOrderedBlogQuery("", filterAndOrder, page)
 
-        return blogPostDao.searchBlogPosts(query, page)
+        return blogPostDao.returnOrderedBlogQuery(query, filterAndOrder, page)
     }
 
     suspend fun insertBlogPostToDatabase(
