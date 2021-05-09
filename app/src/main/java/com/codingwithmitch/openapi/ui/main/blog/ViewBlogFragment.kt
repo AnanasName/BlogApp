@@ -9,6 +9,7 @@ import com.codingwithmitch.openapi.R
 import com.codingwithmitch.openapi.models.BlogPost
 import com.codingwithmitch.openapi.ui.main.blog.state.BlogStateEvent
 import com.codingwithmitch.openapi.ui.main.blog.state.BlogStateEvent.CheckAuthorOfBlogPost
+import com.codingwithmitch.openapi.ui.main.blog.state.BlogStateEvent.DeleteBlogPostEvent
 import com.codingwithmitch.openapi.ui.main.blog.viewmodel.isAuthorOfBlogPost
 import com.codingwithmitch.openapi.ui.main.blog.viewmodel.setIsAuthorOfBlogPost
 import kotlinx.android.synthetic.main.fragment_view_blog.*
@@ -29,6 +30,10 @@ class ViewBlogFragment : BaseBlogFragment() {
         subscribeObservers()
         checkIsAuthorOfBlogPost()
         stateChangeListener.expandAppbar()
+
+        delete_button.setOnClickListener {
+            deleteBlogPost()
+        }
     }
 
     private fun subscribeObservers(){
@@ -74,6 +79,12 @@ class ViewBlogFragment : BaseBlogFragment() {
             inflater.inflate(R.menu.edit_view_menu, menu)
 
         super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    private fun deleteBlogPost(){
+        viewModel.setStateEvent(
+            DeleteBlogPostEvent
+        )
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

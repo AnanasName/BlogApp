@@ -24,6 +24,7 @@ class BlogListAdapter(
         "",
         "",
         "",
+        "",
         0L,
         ""
     )
@@ -31,7 +32,7 @@ class BlogListAdapter(
     val DIFF_CALLBACK = object : DiffUtil.ItemCallback<BlogPost>() {
 
         override fun areItemsTheSame(oldItem: BlogPost, newItem: BlogPost): Boolean {
-            return oldItem.pk == newItem.pk
+            return oldItem.blogPk == newItem.blogPk
         }
 
         override fun areContentsTheSame(oldItem: BlogPost, newItem: BlogPost): Boolean {
@@ -118,8 +119,7 @@ class BlogListAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        if (differ.currentList[position].pk.equals(NO_MORE_RESULT.toString())) {
-            Log.d("SOMETHING", "Yep")
+        if (differ.currentList[position].blogPk.equals(NO_MORE_RESULT.toString())) {
             return NO_MORE_RESULT
         }
         return BLOG_ITEM

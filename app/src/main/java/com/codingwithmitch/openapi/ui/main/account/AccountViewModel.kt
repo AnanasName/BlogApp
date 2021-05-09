@@ -1,7 +1,6 @@
 package com.codingwithmitch.openapi.ui.main.account
 
 import android.util.Log
-import androidx.lifecycle.viewModelScope
 import com.codingwithmitch.openapi.models.AccountProperties
 import com.codingwithmitch.openapi.repository.main.AccountRepository
 import com.codingwithmitch.openapi.session.SessionManager
@@ -9,13 +8,10 @@ import com.codingwithmitch.openapi.ui.BaseViewModel
 import com.codingwithmitch.openapi.ui.DataState
 import com.codingwithmitch.openapi.ui.Response
 import com.codingwithmitch.openapi.ui.ResponseType
-import com.codingwithmitch.openapi.ui.auth.state.AuthStateEvent
 import com.codingwithmitch.openapi.ui.main.account.state.AccountStateEvent
 import com.codingwithmitch.openapi.ui.main.account.state.AccountStateEvent.*
 import com.codingwithmitch.openapi.ui.main.account.state.AccountViewState
-import com.codingwithmitch.openapi.util.AbsentLiveData
 import kotlinx.coroutines.*
-import kotlinx.coroutines.Dispatchers.Main
 import javax.inject.Inject
 
 class AccountViewModel
@@ -105,7 +101,7 @@ constructor(
                     }
                 }
 
-                result = accountRepository.getAccountProperties(id)
+                result = accountRepository.getAccountPropertiesFromNetwork(id)
 
 
 
@@ -152,7 +148,7 @@ constructor(
 
                 _dataState.value = DataState.loading(true)
 
-                result = accountRepository.saveAccountProperties(
+                result = accountRepository.saveAccountPropertiesToNetwork(
                     AccountProperties(
                         id,
                         stateEvent.email,
@@ -209,7 +205,7 @@ constructor(
 
                 _dataState.value = DataState.loading(true, null)
 
-                result = accountRepository.updatePassword(stateEvent.currentPassword, stateEvent.newPassword)
+                result = accountRepository.updatePasswordInNetwork(stateEvent.currentPassword, stateEvent.newPassword)
 
                 _dataState.value = result
             }

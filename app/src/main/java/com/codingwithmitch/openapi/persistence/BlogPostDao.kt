@@ -1,9 +1,6 @@
 package com.codingwithmitch.openapi.persistence
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.codingwithmitch.openapi.models.BlogPost
 import com.codingwithmitch.openapi.util.Constants.Companion.PAGINATION_PAGE_SIZE
 
@@ -37,6 +34,9 @@ interface BlogPostDao {
         page: Int,
         pageSize: Int = PAGINATION_PAGE_SIZE
     ): List<BlogPost>
+
+    @Delete
+    suspend fun deleteBlogPost(blogPost: BlogPost)
 
     @Query(
         """

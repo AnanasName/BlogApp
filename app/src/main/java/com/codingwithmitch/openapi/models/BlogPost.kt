@@ -12,8 +12,11 @@ import kotlinx.android.parcel.Parcelize
 data class BlogPost(
 
     @PrimaryKey(autoGenerate = false)
-    @ColumnInfo(name = "pk")
-    var pk: String,
+    @ColumnInfo(name="blogPk")
+    var blogPk: String,
+
+    @ColumnInfo(name = "authorPk")
+    var authorPk: String,
 
     @ColumnInfo(name = "title")
     var title: String,
@@ -35,12 +38,14 @@ data class BlogPost(
         "",
         "",
         "",
+        "",
         0L,
         ""
     )
 
     override fun toString(): String {
-        return "BlogPost(pk=$pk, " +
+        return "BlogPost(authorPk=$authorPk, " +
+                "blogPk='$blogPk', " +
                 "title='$title', " +
                 "image='$image', " +
                 "date_updated=$date_updated, " +

@@ -19,6 +19,7 @@ import kotlinx.coroutines.tasks.await
 
 const val CHANGES_APPLIED = "Changes applied"
 const val BLOG_POSTS_COLLECTION = "blog_posts"
+const val SUCCESS_DELETED = "Success Deleted"
 
 class MainService(
     private val firebaseFirestore: FirebaseFirestore
@@ -177,6 +178,26 @@ class MainService(
                     Response("Data retrieved success", ResponseType.None)
                 )
             }
+
+            result
+        }
+    }
+
+    suspend fun deleteBlogPost(blogPk: String): DataState<BlogViewState> {
+        return safeApiCall {
+
+            var result: DataState<BlogViewState> =
+                DataState.data(null, Response(SUCCESS_DELETED, ResponseType.Toast))
+
+            firebaseFirestore
+                .collection(BLOG_POSTS_COLLECTION)
+                .document(blogPk)
+                .delete()
+                .addOnFailureListener{
+                    result = DataState.error(Response("Unsuccessful deleting", ResponseType.Toast))
+                }
+                .await()
+
 
             result
         }

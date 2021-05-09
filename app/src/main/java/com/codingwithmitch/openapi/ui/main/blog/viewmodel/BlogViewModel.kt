@@ -1,9 +1,7 @@
 package com.codingwithmitch.openapi.ui.main.blog.viewmodel
 
 import android.content.SharedPreferences
-import android.util.Log
-import com.bumptech.glide.RequestManager
-import com.codingwithmitch.openapi.models.BlogPost
+import com.codingwithmitch.openapi.api.main.SUCCESS_DELETED
 import com.codingwithmitch.openapi.persistence.BlogQueryUtils
 import com.codingwithmitch.openapi.repository.main.BlogRepository
 import com.codingwithmitch.openapi.session.SessionManager
@@ -68,6 +66,10 @@ constructor(
                 performCheckingIsAuthor()
             }
 
+            is DeleteBlogPostEvent -> {
+                performDeleteBlogPost()
+            }
+
             is None -> {
                 _dataState.value = DataState.data(null, Response(null, ResponseType.None))
             }
@@ -121,7 +123,7 @@ constructor(
                 }
             }
 
-            result = blogRepository.searchBlogPosts(getSearchQuery())
+            result = blogRepository.getBlogPostsFromNetwork(getSearchQuery())
 
             result.data?.data?.let { event ->
                 event.peekContent().blogFields.blogList.forEach { blogPost ->
@@ -160,9 +162,44 @@ constructor(
         }
     }
 
+    private fun performDeleteBlogPost() {
+        initNewJob()
+
+        blogRepository.addJob("performDeleteBlogPost", job)
+
+        var result: DataState<BlogViewState>
+
+        coroutineScope.launch {
+
+            if (!sessionManager.isConnectedToTheInternet()) {
+                _dataState.value = DataState.error(
+                    Response(
+                        "Can't do that operation without internet",
+                        ResponseType.Dialog
+                    )
+                )
+                return@launch
+            }
+
+            _dataState.value = DataState.loading(true, null)
+
+            result = blogRepository.deleteBlogPostFromNetwork(getBlogPost())
+
+            result.data?.let { data ->
+                if (data.response?.peekContent()?.message.equals(SUCCESS_DELETED)){
+                    blogRepository.deleteBlogPostFromDatabase(getBlogPost())
+                    result = DataState.data(null, Response(SUCCESS_DELETED, ResponseType.Toast))
+                }
+            }
+
+            _dataState.value = result
+
+        }
+    }
+
     private fun performCheckingIsAuthor() {
         var isAuthor = false
-        if (sessionManager.getId() == getBlogPost().pk) {
+        if (sessionManager.getId() == getBlogPost().authorPk) {
             isAuthor = true
         }
         _dataState.value = DataState.data(

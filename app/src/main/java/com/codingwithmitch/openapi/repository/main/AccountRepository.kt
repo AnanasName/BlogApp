@@ -19,19 +19,19 @@ constructor(
     private val sessionManager: SessionManager
 ) : JobManager("AccountRepository") {
 
-    suspend fun getAccountProperties(
+    suspend fun getAccountPropertiesFromNetwork(
         id: String
     ): DataState<AccountViewState> {
         return mainService.getAccountProperties(id)
     }
 
-    suspend fun saveAccountProperties(
+    suspend fun saveAccountPropertiesToNetwork(
         accountProperties: AccountProperties
     ): DataState<AccountViewState>{
         return mainService.saveAccountProperties(accountProperties)
     }
 
-    suspend fun updatePassword(
+    suspend fun updatePasswordInNetwork(
         oldPassword: String,
         newPassword: String
     ): DataState<AccountViewState>{
@@ -59,7 +59,7 @@ constructor(
         )
     }
 
-    suspend fun insertAndReplaceAccount(
+    suspend fun insertAndReplaceAccountInDatabase(
         accountProperties: AccountProperties
     ){
         accountPropertiesDao.insertAndReplace(accountProperties)

@@ -18,7 +18,7 @@ constructor(
     val sessionManager: SessionManager
 ) : JobManager("BlogRepository") {
 
-    suspend fun searchBlogPosts(
+    suspend fun getBlogPostsFromNetwork(
         query: String?
     ): DataState<BlogViewState> {
         if (query.isNullOrBlank()) {
@@ -44,5 +44,17 @@ constructor(
         blogPost: BlogPost
     ){
         blogPostDao.insert(blogPost)
+    }
+
+    suspend fun deleteBlogPostFromDatabase(
+        blogPost: BlogPost
+    ){
+        blogPostDao.deleteBlogPost(blogPost)
+    }
+
+    suspend fun deleteBlogPostFromNetwork(
+        blogPost: BlogPost
+    ): DataState<BlogViewState> {
+        return mainService.deleteBlogPost(blogPost.blogPk)
     }
 }
