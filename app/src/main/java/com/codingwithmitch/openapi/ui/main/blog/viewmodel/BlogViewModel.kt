@@ -49,7 +49,7 @@ constructor(
         return BlogViewState()
     }
 
-    fun saveFilterOptions(filter: String, order: String){
+    fun saveFilterOptions(filter: String, order: String) {
         editor.putString(BLOG_FILTER, filter)
         editor.apply()
 
@@ -65,7 +65,7 @@ constructor(
             }
 
             is CheckAuthorOfBlogPost -> {
-
+                performCheckingIsAuthor()
             }
 
             is None -> {
@@ -96,8 +96,19 @@ constructor(
         var result: DataState<BlogViewState>
 
         coroutineScope.launch {
-            var cachingData = blogRepository.getBlogPostsFromDatabase(getSearchQuery(), getPage(), getOrder() + getFilter())
-            result = DataState.data(BlogViewState(BlogViewState.BlogFields(cachingData, getSearchQuery())), Response("Data retrieved success", ResponseType.None))
+            var cachingData = blogRepository.getBlogPostsFromDatabase(
+                getSearchQuery(),
+                getPage(),
+                getOrder() + getFilter()
+            )
+            result = DataState.data(
+                BlogViewState(
+                    BlogViewState.BlogFields(
+                        cachingData,
+                        getSearchQuery()
+                    )
+                ), Response("Data retrieved success", ResponseType.None)
+            )
 
             if (!sessionManager.isConnectedToTheInternet()) {
                 _dataState.value = result
@@ -121,7 +132,11 @@ constructor(
             }
 
             setQueryInProgress(true)
-            cachingData = blogRepository.getBlogPostsFromDatabase(getSearchQuery(), getPage(), getOrder() + getFilter())
+            cachingData = blogRepository.getBlogPostsFromDatabase(
+                getSearchQuery(),
+                getPage(),
+                getOrder() + getFilter()
+            )
             setQueryInProgress(false)
 
             if (getPage() * PAGINATION_PAGE_SIZE > viewState.value!!.blogFields.blogList.size) {
@@ -133,10 +148,31 @@ constructor(
                         )
                     ), Response("Data retrieved success", ResponseType.None)
                 )
-            }
-            else
-                _dataState.value = DataState.data(BlogViewState(BlogViewState.BlogFields(cachingData, isQueryExhausted = false)), Response("Data retrieved success", ResponseType.None))
+            } else
+                _dataState.value = DataState.data(
+                    BlogViewState(
+                        BlogViewState.BlogFields(
+                            cachingData,
+                            isQueryExhausted = false
+                        )
+                    ), Response("Data retrieved success", ResponseType.None)
+                )
         }
+    }
+
+    private fun performCheckingIsAuthor() {
+        var isAuthor = false
+        if (sessionManager.getId() == getBlogPost().pk) {
+            isAuthor = true
+        }
+        _dataState.value = DataState.data(
+            BlogViewState(
+                BlogViewState.BlogFields(),
+                BlogViewState.ViewBlogFields(
+                    isAuthorOfBlogPost = isAuthor
+                )
+            )
+        )
     }
 
 }
