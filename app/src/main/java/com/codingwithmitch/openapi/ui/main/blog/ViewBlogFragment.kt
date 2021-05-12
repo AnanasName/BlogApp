@@ -1,18 +1,24 @@
 package com.codingwithmitch.openapi.ui.main.blog
 
+import android.content.ContentValues.TAG
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import androidx.core.net.toUri
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.codingwithmitch.openapi.R
+import com.codingwithmitch.openapi.api.main.SUCCESS_DELETED
 import com.codingwithmitch.openapi.models.BlogPost
+import com.codingwithmitch.openapi.ui.AreYouSureCallback
+import com.codingwithmitch.openapi.ui.UIMessage
+import com.codingwithmitch.openapi.ui.UIMessageType
 import com.codingwithmitch.openapi.ui.main.blog.state.BlogStateEvent
 import com.codingwithmitch.openapi.ui.main.blog.state.BlogStateEvent.CheckAuthorOfBlogPost
 import com.codingwithmitch.openapi.ui.main.blog.state.BlogStateEvent.DeleteBlogPostEvent
-import com.codingwithmitch.openapi.ui.main.blog.viewmodel.isAuthorOfBlogPost
-import com.codingwithmitch.openapi.ui.main.blog.viewmodel.setIsAuthorOfBlogPost
+import com.codingwithmitch.openapi.ui.main.blog.viewmodel.*
 import kotlinx.android.synthetic.main.fragment_view_blog.*
+import java.lang.Exception
 
 class ViewBlogFragment : BaseBlogFragment() {
 
@@ -32,11 +38,11 @@ class ViewBlogFragment : BaseBlogFragment() {
         stateChangeListener.expandAppbar()
 
         delete_button.setOnClickListener {
-            deleteBlogPost()
+            confirmDeleteRequest()
         }
     }
 
-    private fun subscribeObservers(){
+    private fun subscribeObservers() {
         viewModel.dataState.observe(viewLifecycleOwner, Observer { dataState ->
             stateChangeListener.onDataStateChange(dataState)
             dataState.data?.let { data ->
@@ -44,6 +50,13 @@ class ViewBlogFragment : BaseBlogFragment() {
                     viewModel.setIsAuthorOfBlogPost(
                         viewState.viewBlogFields.isAuthorOfBlogPost
                     )
+                }
+
+                data.response?.peekContent()?.let { response ->
+                    if (response.message.equals(SUCCESS_DELETED)) {
+                        viewModel.removeDeletedBlogPost()
+                        findNavController().popBackStack()
+                    }
                 }
             }
         })
@@ -53,17 +66,17 @@ class ViewBlogFragment : BaseBlogFragment() {
                 setBlogProperties(blogPost)
             }
 
-            if (viewState.viewBlogFields.isAuthorOfBlogPost){
+            if (viewState.viewBlogFields.isAuthorOfBlogPost) {
                 adaptViewToAuthorMode()
             }
         })
     }
 
-    private fun checkIsAuthorOfBlogPost(){
+    private fun checkIsAuthorOfBlogPost() {
         viewModel.setStateEvent(CheckAuthorOfBlogPost)
     }
 
-    private fun setBlogProperties(blogPost: BlogPost){
+    private fun setBlogProperties(blogPost: BlogPost) {
         requestManager
             .load(blogPost.image)
             .into(blog_image)
@@ -81,15 +94,34 @@ class ViewBlogFragment : BaseBlogFragment() {
         super.onCreateOptionsMenu(menu, inflater)
     }
 
-    private fun deleteBlogPost(){
+    private fun confirmDeleteRequest() {
+        val callback: AreYouSureCallback = object : AreYouSureCallback {
+            override fun proceed() {
+                deleteBlogPost()
+            }
+
+            override fun cancel() {
+
+            }
+        }
+
+        uiCommunicationListener.onUIMessageReceived(
+            UIMessage(
+                getString(R.string.are_you_sure_delete),
+                UIMessageType.AreYouSureDialog(callback)
+            )
+        )
+    }
+
+    private fun deleteBlogPost() {
         viewModel.setStateEvent(
             DeleteBlogPostEvent
         )
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (viewModel.isAuthorOfBlogPost()){
-            when(item.itemId){
+        if (viewModel.isAuthorOfBlogPost()) {
+            when (item.itemId) {
                 R.id.edit -> {
                     navUpdateBlogFragment()
                     return true
@@ -100,8 +132,15 @@ class ViewBlogFragment : BaseBlogFragment() {
         return super.onOptionsItemSelected(item)
     }
 
-    fun navUpdateBlogFragment(){
-        findNavController().navigate(R.id.action_viewBlogFragment_to_updateBlogFragment)
+    fun navUpdateBlogFragment() {
+        try {
+            viewModel.setUpdatedBlogPost(
+                viewModel.getBlogPost()
+            )
+            findNavController().navigate(R.id.action_viewBlogFragment_to_updateBlogFragment)
+        } catch (e: Exception) {
+            Log.e(TAG, "Exception:${e.message}")
+        }
     }
 
     private fun adaptViewToAuthorMode() {

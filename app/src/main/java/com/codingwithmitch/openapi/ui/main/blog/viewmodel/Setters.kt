@@ -53,3 +53,27 @@ fun BlogViewModel.setBlogOrder(order: String){
     update.blogFields.order = order
     setViewState(update)
 }
+
+fun BlogViewModel.removeDeletedBlogPost(){
+    val update = getCurrentViewStateOrNew()
+    val list = update.blogFields.blogList.toMutableList()
+    for (i in 0 until list.size){
+        if (list[i] == getBlogPost()){
+            list.remove(getBlogPost())
+            break
+        }
+    }
+    setBlogListData(list)
+}
+
+fun BlogViewModel.setUpdatedBlogPost(
+    blogPost: BlogPost?
+){
+    val update = getCurrentViewStateOrNew()
+    val updatedBlogFields = update.updateBlogFields
+    blogPost?.let {
+        updatedBlogFields.blogPost = it
+    }
+    update.updateBlogFields = updatedBlogFields
+    setViewState(update)
+}

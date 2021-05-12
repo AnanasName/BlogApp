@@ -17,9 +17,10 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObjects
 import kotlinx.coroutines.tasks.await
 
-const val CHANGES_APPLIED = "Changes applied"
+const val CHANGES_APPLIED = "Changes Applied"
 const val BLOG_POSTS_COLLECTION = "blog_posts"
 const val SUCCESS_DELETED = "Success Deleted"
+const val SUCCESS_UPDATED = "Success Updated"
 
 class MainService(
     private val firebaseFirestore: FirebaseFirestore
@@ -198,6 +199,27 @@ class MainService(
                 }
                 .await()
 
+
+            result
+        }
+    }
+
+    suspend fun updateBlog(blogPost: BlogPost): DataState<BlogViewState>{
+        return safeApiCall {
+
+            //Upload New Image
+
+            var result: DataState<BlogViewState> =
+                DataState.data(null, Response(SUCCESS_UPDATED, ResponseType.Toast))
+
+            firebaseFirestore
+                .collection(BLOG_POSTS_COLLECTION)
+                .document(blogPost.blogPk)
+                .set(blogPost)
+                .addOnFailureListener{
+                    result = DataState.error(Response("Unsuccessful updating", ResponseType.Toast))
+                }
+                .await()
 
             result
         }

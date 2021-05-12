@@ -1,4 +1,4 @@
-package com.codingwithmitch.openapi.repository.main
+ package com.codingwithmitch.openapi.repository.main
 
 import com.codingwithmitch.openapi.api.main.MainService
 import com.codingwithmitch.openapi.models.BlogPost
@@ -56,5 +56,17 @@ constructor(
         blogPost: BlogPost
     ): DataState<BlogViewState> {
         return mainService.deleteBlogPost(blogPost.blogPk)
+    }
+
+    suspend fun updateBlogInNetwork(
+        blogPost: BlogPost
+    ): DataState<BlogViewState>{
+        return mainService.updateBlog(blogPost)
+    }
+
+    suspend fun updateBlogInDatabase(
+        blogPost: BlogPost
+    ){
+        blogPostDao.updateBlogPost(blogPost.blogPk, blogPost.title, blogPost.body, blogPost.image)
     }
 }

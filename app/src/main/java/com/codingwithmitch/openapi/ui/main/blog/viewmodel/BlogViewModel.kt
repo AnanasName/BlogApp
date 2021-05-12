@@ -2,6 +2,7 @@ package com.codingwithmitch.openapi.ui.main.blog.viewmodel
 
 import android.content.SharedPreferences
 import com.codingwithmitch.openapi.api.main.SUCCESS_DELETED
+import com.codingwithmitch.openapi.api.main.SUCCESS_UPDATED
 import com.codingwithmitch.openapi.persistence.BlogQueryUtils
 import com.codingwithmitch.openapi.repository.main.BlogRepository
 import com.codingwithmitch.openapi.session.SessionManager
@@ -68,6 +69,10 @@ constructor(
 
             is DeleteBlogPostEvent -> {
                 performDeleteBlogPost()
+            }
+
+            is UpdatedBlogPostEvent -> {
+                performUpdateBlogPost(stateEvent)
             }
 
             is None -> {
@@ -186,7 +191,7 @@ constructor(
             result = blogRepository.deleteBlogPostFromNetwork(getBlogPost())
 
             result.data?.let { data ->
-                if (data.response?.peekContent()?.message.equals(SUCCESS_DELETED)){
+                if (data.response?.peekContent()?.message.equals(SUCCESS_DELETED)) {
                     blogRepository.deleteBlogPostFromDatabase(getBlogPost())
                     result = DataState.data(null, Response(SUCCESS_DELETED, ResponseType.Toast))
                 }
@@ -194,6 +199,50 @@ constructor(
 
             _dataState.value = result
 
+        }
+    }
+
+    private fun performUpdateBlogPost(stateEvent: UpdatedBlogPostEvent) {
+        initNewJob()
+
+        blogRepository.addJob("performUpdateBlogPost", job)
+
+        var result: DataState<BlogViewState>
+
+        coroutineScope.launch {
+
+            if (!sessionManager.isConnectedToTheInternet()) {
+                _dataState.value = DataState.error(
+                    Response(
+                        "Can't do that operation without internet",
+                        ResponseType.Dialog
+                    )
+                )
+                return@launch
+            }
+
+            _dataState.value = DataState.loading(true, null)
+
+            val blogPost = getBlogPost().copy()
+            blogPost.title = stateEvent.title
+            blogPost.body = stateEvent.body
+
+            //Set New image
+
+            result = blogRepository.updateBlogInNetwork(blogPost)
+
+            result.data?.let { data ->
+                if (data.response?.peekContent()?.message.equals(SUCCESS_UPDATED)) {
+                    viewState.value?.let { viewState ->
+                        viewState.updateBlogFields.blogPost?.let {
+                            blogRepository.updateBlogInDatabase(it)
+                            result = DataState.data(null, Response (SUCCESS_UPDATED, ResponseType.Toast))
+                        }
+                    }
+                }
+            }
+
+            _dataState.value = result
         }
     }
 

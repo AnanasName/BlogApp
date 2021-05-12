@@ -20,6 +20,14 @@ interface BlogPostDao {
         pageSize: Int = PAGINATION_PAGE_SIZE
     ): List<BlogPost>
 
+    @Query("""
+        UPDATE blog_post SET title = :title,
+        body = :body,
+        image = :image
+        WHERE blogPk = :blogPk
+    """)
+    suspend fun updateBlogPost(blogPk: String, title: String, body: String, image: String)
+
     @Query(
         """
         SELECT * FROM blog_post 
