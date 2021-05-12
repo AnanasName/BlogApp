@@ -41,3 +41,12 @@ fun BlogViewModel.getSearchQuery(): String{
 fun BlogViewModel.getIsQueryInProgress(): Boolean{
     return getCurrentViewStateOrNew().blogFields.isQueryInProgress
 }
+
+fun BlogViewModel.getUpdatedBlogPost(): BlogPost? {
+    getCurrentViewStateOrNew().let {
+        it.updateBlogFields.blogPost?.let {
+            return it
+        }
+    }
+    return null
+}

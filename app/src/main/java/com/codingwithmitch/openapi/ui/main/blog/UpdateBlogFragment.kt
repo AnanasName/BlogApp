@@ -1,11 +1,17 @@
 package com.codingwithmitch.openapi.ui.main.blog
 
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import com.codingwithmitch.openapi.R
+import com.codingwithmitch.openapi.api.main.SUCCESS_UPDATED
 import com.codingwithmitch.openapi.models.BlogPost
 import com.codingwithmitch.openapi.ui.main.blog.state.BlogStateEvent
+import com.codingwithmitch.openapi.ui.main.blog.viewmodel.getBlogPost
+import com.codingwithmitch.openapi.ui.main.blog.viewmodel.onBlogPostUpdateSuccess
+import com.codingwithmitch.openapi.ui.main.blog.viewmodel.setUpdatedBlogPost
 import kotlinx.android.synthetic.main.fragment_update_blog.*
 
 class UpdateBlogFragment : BaseBlogFragment() {
@@ -28,11 +34,11 @@ class UpdateBlogFragment : BaseBlogFragment() {
         viewModel.dataState.observe(viewLifecycleOwner, Observer { dataState ->
 
             stateChangeListener.onDataStateChange(dataState)
-            dataState.data?.let { data ->
-                data.data?.getContentIfNotHandled()?.let { viewState ->
 
-                    viewState.viewBlogFields.blogPost?.let {
-                        
+            dataState.data?.let { data ->
+                data.response?.let { event ->
+                    if (event.peekContent().message.equals(SUCCESS_UPDATED)){
+                        findNavController().popBackStack()
                     }
                 }
             }
@@ -77,6 +83,16 @@ class UpdateBlogFragment : BaseBlogFragment() {
                 blog_body.text.toString(),
                 null
             )
+        )
+    }
+
+    override fun onPause() {
+        super.onPause()
+        val blogPost = viewModel.getBlogPost().copy()
+        blogPost.title = blog_title.text.toString()
+        blogPost.body = blog_body.text.toString()
+        viewModel.setUpdatedBlogPost(
+            blogPost
         )
     }
 }

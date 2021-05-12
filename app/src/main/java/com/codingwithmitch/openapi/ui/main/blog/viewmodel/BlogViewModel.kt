@@ -236,7 +236,8 @@ constructor(
                     viewState.value?.let { viewState ->
                         viewState.updateBlogFields.blogPost?.let {
                             blogRepository.updateBlogInDatabase(it)
-                            result = DataState.data(null, Response (SUCCESS_UPDATED, ResponseType.Toast))
+                            result = DataState.data(null, Response(SUCCESS_UPDATED, ResponseType.Toast))
+                            onBlogPostUpdateSuccess(blogPost)
                         }
                     }
                 }
