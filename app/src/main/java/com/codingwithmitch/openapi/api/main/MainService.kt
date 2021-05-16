@@ -1,6 +1,7 @@
 package com.codingwithmitch.openapi.api.main
 
-import android.util.Log
+import android.net.Uri
+import androidx.core.net.toUri
 import com.codingwithmitch.openapi.api.auth.USERS_COLLECTION
 import com.codingwithmitch.openapi.models.AccountProperties
 import com.codingwithmitch.openapi.models.BlogPost
@@ -11,19 +12,25 @@ import com.codingwithmitch.openapi.ui.ResponseType
 import com.codingwithmitch.openapi.ui.main.account.state.AccountViewState
 import com.codingwithmitch.openapi.ui.main.blog.state.BlogViewState
 import com.codingwithmitch.openapi.ui.main.blog.state.BlogViewState.*
+import com.codingwithmitch.openapi.ui.main.create_blog.CreateBlogViewModel
+import com.codingwithmitch.openapi.ui.main.create_blog.state.CreateBlogViewState
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.toObjects
+import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
+import java.util.*
 
 const val CHANGES_APPLIED = "Changes Applied"
 const val BLOG_POSTS_COLLECTION = "blog_posts"
 const val SUCCESS_DELETED = "Success Deleted"
 const val SUCCESS_UPDATED = "Success Updated"
+const val SUCCESS_CREATE = "Success Create"
 
 class MainService(
-    private val firebaseFirestore: FirebaseFirestore
+    private val firebaseFirestore: FirebaseFirestore,
+    private val firebaseReference: StorageReference
 ) {
 
     suspend fun getAccountProperties(
@@ -194,7 +201,7 @@ class MainService(
                 .collection(BLOG_POSTS_COLLECTION)
                 .document(blogPk)
                 .delete()
-                .addOnFailureListener{
+                .addOnFailureListener {
                     result = DataState.error(Response("Unsuccessful deleting", ResponseType.Toast))
                 }
                 .await()
@@ -204,19 +211,24 @@ class MainService(
         }
     }
 
-    suspend fun updateBlog(blogPost: BlogPost): DataState<BlogViewState>{
+    suspend fun updateBlog(blogPost: BlogPost): DataState<BlogViewState> {
         return safeApiCall {
-
-            //Upload New Image
 
             var result: DataState<BlogViewState> =
                 DataState.data(null, Response(SUCCESS_UPDATED, ResponseType.Toast))
 
+            //Upload New Image
+            val url = uploadImage(blogPost.blogPk, blogPost.image.toUri())
+
+            val copyBlogPost = blogPost.copy()
+
+            copyBlogPost.image = url
+
             firebaseFirestore
                 .collection(BLOG_POSTS_COLLECTION)
                 .document(blogPost.blogPk)
-                .set(blogPost)
-                .addOnFailureListener{
+                .set(copyBlogPost)
+                .addOnFailureListener {
                     result = DataState.error(Response("Unsuccessful updating", ResponseType.Toast))
                 }
                 .await()
@@ -225,10 +237,75 @@ class MainService(
         }
     }
 
+    suspend fun createBlog(
+        authorId: String,
+        title: String,
+        body: String,
+        image: Uri
+    ): DataState<CreateBlogViewState> {
+        return safeApiCall {
+
+            val blogPk = UUID.randomUUID().toString()
+
+            //upload Image
+            val url = uploadImage(blogPk, image)
+
+            var username = "None"
+
+            username = firebaseFirestore
+                .collection(USERS_COLLECTION)
+                .document(authorId)
+                .get()
+                .await()
+                .toObject(AccountProperties::class.java)!!.username
+
+            val blogPost = BlogPost(
+                blogPk,
+                authorId,
+                title,
+                body,
+                url,
+                getCurrentDate(),
+                username
+            )
+
+            var result: DataState<CreateBlogViewState> =
+                DataState.data(
+                    CreateBlogViewState(CreateBlogViewState.NewBlogFields(blogPost, null)),
+                    Response(SUCCESS_CREATE, ResponseType.Toast)
+                )
+
+            firebaseFirestore
+                .collection(BLOG_POSTS_COLLECTION)
+                .document(blogPost.blogPk)
+                .set(blogPost)
+                .addOnFailureListener {
+                    result = DataState.error(Response("Unsuccessful creating", ResponseType.Toast))
+                }
+                .await()
+
+            result
+        }
+    }
+
+    private suspend fun uploadImage(blogPk: String, imageUri: Uri): String {
+        val ref = firebaseReference.child("images/$blogPk")
+        ref.putFile(imageUri)
+            .await()
+
+        return ref.downloadUrl.await().toString()
+    }
+
     private fun sortResultWithQuery(query: String, blogList: List<BlogPost>): List<BlogPost> {
         return blogList.filter {
             it.body.contains(query) || it.title.contains(query) || it.username.contains(query)
         }
+    }
+
+    private fun getCurrentDate(): String {
+        val currentDate = Date()
+        val sdf = SimpleDateFormat("yyyy-MM-dd")
+        return sdf.format(currentDate)
     }
 
 }

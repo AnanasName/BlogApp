@@ -28,7 +28,7 @@ data class BlogPost(
     var image: String,
 
     @ColumnInfo(name = "date_updated")
-    var date_updated: Long,
+    var date_updated: String,
 
     @ColumnInfo(name = "username")
     var username: String
@@ -39,7 +39,7 @@ data class BlogPost(
         "",
         "",
         "",
-        0L,
+        "",
         ""
     )
 

@@ -6,7 +6,7 @@ import com.codingwithmitch.openapi.models.AccountProperties
 import com.codingwithmitch.openapi.models.AuthToken
 import com.codingwithmitch.openapi.models.BlogPost
 
-@Database(entities = [AccountProperties::class, BlogPost::class], version = 6)
+@Database(entities = [AccountProperties::class, BlogPost::class], version = 7)
 abstract class AppDatabase: RoomDatabase() {
 
     abstract fun getAccountPropertiesDao(): AccountPropertiesDao

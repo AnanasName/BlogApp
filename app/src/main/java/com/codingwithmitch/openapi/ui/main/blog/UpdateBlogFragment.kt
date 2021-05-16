@@ -1,7 +1,6 @@
 package com.codingwithmitch.openapi.ui.main.blog
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -10,9 +9,13 @@ import com.codingwithmitch.openapi.api.main.SUCCESS_UPDATED
 import com.codingwithmitch.openapi.models.BlogPost
 import com.codingwithmitch.openapi.ui.main.blog.state.BlogStateEvent
 import com.codingwithmitch.openapi.ui.main.blog.viewmodel.getBlogPost
-import com.codingwithmitch.openapi.ui.main.blog.viewmodel.onBlogPostUpdateSuccess
 import com.codingwithmitch.openapi.ui.main.blog.viewmodel.setUpdatedBlogPost
+import kotlinx.android.synthetic.main.fragment_create_blog.*
 import kotlinx.android.synthetic.main.fragment_update_blog.*
+import kotlinx.android.synthetic.main.fragment_update_blog.blog_body
+import kotlinx.android.synthetic.main.fragment_update_blog.blog_image
+import kotlinx.android.synthetic.main.fragment_update_blog.blog_title
+import kotlinx.android.synthetic.main.fragment_update_blog.update_textview
 
 class UpdateBlogFragment : BaseBlogFragment() {
 
@@ -27,6 +30,19 @@ class UpdateBlogFragment : BaseBlogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
+
+//        blog_image.setOnClickListener {
+//            if (stateChangeListener.isStoragePermissionGranted()){
+//                pickFromGallery()
+//            }
+//        }
+//
+//        update_textview.setOnClickListener {
+//            if (stateChangeListener.isStoragePermissionGranted()){
+//                pickFromGallery()
+//            }
+//        }
+
         subscribeObservers()
     }
 
