@@ -1,5 +1,6 @@
 package com.codingwithmitch.openapi.ui.main.blog.viewmodel
 
+import android.util.Log
 import com.codingwithmitch.openapi.models.BlogPost
 
 fun BlogViewModel.setQuery(query: String) {
@@ -73,6 +74,7 @@ fun BlogViewModel.setUpdatedBlogPost(
     val updatedBlogFields = update.updateBlogFields
     blogPost?.let {
         updatedBlogFields.blogPost = it
+        Log.d("SMG", updatedBlogFields.blogPost?.image)
     }
     update.updateBlogFields = updatedBlogFields
     setViewState(update)

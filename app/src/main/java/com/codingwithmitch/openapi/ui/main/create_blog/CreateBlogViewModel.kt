@@ -36,7 +36,7 @@ constructor(
         when (stateEvent) {
 
             is CreateNewBlogEvent -> {
-                handleCreateNewBlog(stateEvent)
+                performCreateNewBlog(stateEvent)
             }
 
             is CreateBlogStateEvent.None -> {
@@ -45,10 +45,10 @@ constructor(
         }
     }
 
-    private fun handleCreateNewBlog(stateEvent: CreateNewBlogEvent) {
+    private fun performCreateNewBlog(stateEvent: CreateNewBlogEvent) {
         initNewJob()
 
-        createBlogRepository.addJob("performUpdateBlogPost", job)
+        createBlogRepository.addJob("performCreateNewBlog", job)
 
         var result: DataState<CreateBlogViewState> =
             DataState.error(Response("Error occurred", ResponseType.Toast))
@@ -87,74 +87,86 @@ constructor(
             }
         }
 
-        _dataState.value = DataState.data(data = null, response = Response(SUCCESS_CREATE, ResponseType.Toast))
+        _dataState.value =
+            DataState.data(data = null, response = Response(SUCCESS_CREATE, ResponseType.Toast))
     }
 
-fun setNewTitle(title: String?) {
-    val update = getCurrentViewStateOrNew()
-    val newBlogFields = update.blogFields
-    title?.let {
-        newBlogFields.blogPost?.title = title
+    fun setNewTitle(title: String?) {
+        val update = getCurrentViewStateOrNew()
+        val newBlogFields = update.blogFields
+        title?.let {
+            newBlogFields.title = title
+        }
+        setViewState(update)
     }
-    setViewState(update)
-}
 
-fun setNewBody(body: String?) {
-    val update = getCurrentViewStateOrNew()
-    val newBlogFields = update.blogFields
-    body?.let {
-        newBlogFields.blogPost?.body = body
+    fun setNewBody(body: String?) {
+        val update = getCurrentViewStateOrNew()
+        val newBlogFields = update.blogFields
+        body?.let {
+            newBlogFields.body = body
+        }
+        setViewState(update)
     }
-    setViewState(update)
-}
 
-fun setNewImage(image: Uri?) {
-    val update = getCurrentViewStateOrNew()
-    val newBlogFields = update.blogFields
-    image?.let {
-        newBlogFields.image = it
+    fun setNewImage(image: Uri?) {
+        val update = getCurrentViewStateOrNew()
+        val newBlogFields = update.blogFields
+        image?.let {
+            newBlogFields.image = it
+        }
+        setViewState(update)
     }
-    setViewState(update)
-}
 
-fun getTitle(): String? {
-    return viewState.value?.blogFields?.blogPost?.title
-}
-
-fun getBody(): String? {
-    return viewState.value?.blogFields?.blogPost?.body
-}
-
-fun getImage(): Uri? {
-    return viewState.value?.blogFields?.image
-}
-
-fun setNewBlogPost(blogPost: BlogPost?) {
-    val update = getCurrentViewStateOrNew()
-    val newBlogFields = update.blogFields
-    blogPost?.let {
-        newBlogFields.blogPost = blogPost
+    fun getTitle(): String? {
+        return viewState.value?.blogFields?.title
     }
-    setViewState(update)
-}
 
-fun clearNewBlogFields() {
-    val update = getCurrentViewStateOrNew()
-    update.blogFields = NewBlogFields(null, null)
-    setViewState(update)
-}
+    fun getBody(): String? {
+        return viewState.value?.blogFields?.body
+    }
 
-fun cancelActiveJobs() {
-    createBlogRepository.cancelActiveJobs()
-    handlePendingData()
-}
+    fun getImage(): Uri? {
+        return viewState.value?.blogFields?.image
+    }
 
-private fun handlePendingData() {
-    setStateEvent(CreateBlogStateEvent.None)
-}
+    fun setNewBlogPost(blogPost: BlogPost?) {
+        val update = getCurrentViewStateOrNew()
+        val newBlogFields = update.blogFields
+        blogPost?.let {
+            newBlogFields.blogPost = blogPost
+        }
+        setViewState(update)
+    }
 
-override fun onCleared() {
-    super.onCleared()
-    cancelActiveJobs()
-}
+    fun clearNewBlogFields() {
+        val update = getCurrentViewStateOrNew()
+        update.blogFields = NewBlogFields(null, null, null, null)
+        setViewState(update)
+    }
+
+    fun cancelActiveJobs() {
+        createBlogRepository.cancelActiveJobs()
+        handlePendingData()
+    }
+
+    private fun handlePendingData() {
+        setStateEvent(CreateBlogStateEvent.None)
+    }
+
+    public fun setNewBlogFields(title: String?, body: String?, uri: Uri?) {
+        val update = getCurrentViewStateOrNew()
+        val newBlogFields = update.blogFields
+        title?.let { newBlogFields.title = it }
+        body?.let { newBlogFields.body = it }
+        uri?.let { newBlogFields.image = it }
+        update.blogFields = newBlogFields
+        _viewState.value = update
+    }
+
+
+    override fun onCleared() {
+        super.onCleared()
+        cancelActiveJobs()
+    }
 }

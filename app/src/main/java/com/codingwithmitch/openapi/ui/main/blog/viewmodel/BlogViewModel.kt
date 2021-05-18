@@ -1,6 +1,9 @@
 package com.codingwithmitch.openapi.ui.main.blog.viewmodel
 
 import android.content.SharedPreferences
+import android.net.Uri
+import android.util.Log
+import androidx.core.net.toUri
 import com.codingwithmitch.openapi.api.main.SUCCESS_DELETED
 import com.codingwithmitch.openapi.api.main.SUCCESS_UPDATED
 import com.codingwithmitch.openapi.persistence.BlogQueryUtils
@@ -16,6 +19,7 @@ import com.codingwithmitch.openapi.ui.main.blog.state.BlogViewState
 import com.codingwithmitch.openapi.util.Constants.Companion.PAGINATION_PAGE_SIZE
 import com.codingwithmitch.openapi.util.PreferencesKeys.Companion.BLOG_FILTER
 import com.codingwithmitch.openapi.util.PreferencesKeys.Companion.BLOG_ORDER
+import kotlinx.android.synthetic.main.fragment_update_blog.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -226,8 +230,7 @@ constructor(
             val blogPost = getBlogPost().copy()
             blogPost.title = stateEvent.title
             blogPost.body = stateEvent.body
-
-            //Set New image
+            blogPost.image = stateEvent.image.toString()
 
             result = blogRepository.updateBlogInNetwork(blogPost)
 
@@ -260,6 +263,18 @@ constructor(
                 )
             )
         )
+    }
+
+    fun setUpdatedImage(resultUri: Uri?) {
+        val blogPost = getUpdatedBlogPost()?.copy()
+        blogPost?.image = resultUri.toString()
+        setUpdatedBlogPost(
+            blogPost
+        )
+    }
+
+    fun getUpdatedImage(): Uri?{
+        return getUpdatedBlogPost()?.image?.toUri()
     }
 
 }

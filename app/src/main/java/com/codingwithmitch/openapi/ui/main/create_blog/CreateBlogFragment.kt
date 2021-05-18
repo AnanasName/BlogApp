@@ -21,7 +21,6 @@ import com.theartofdev.edmodo.cropper.CropImageView
 import kotlinx.android.synthetic.main.fragment_create_blog.*
 import retrofit2.http.Url
 
-
 const val ERROR_SOMETHING_WRONG_WITH_IMAGE = "Something Wrong With Image"
 
 class CreateBlogFragment : BaseCreateBlogFragment() {
@@ -56,7 +55,6 @@ class CreateBlogFragment : BaseCreateBlogFragment() {
     private fun subscribeObservers() {
         viewModel.dataState.observe(viewLifecycleOwner, Observer { dataState ->
             stateChangeListener.onDataStateChange(dataState)
-            (activity as MainActivity).displayProgressBar(false)
 
             dataState.data?.let { data ->
                 data.response?.let { event ->
@@ -75,9 +73,9 @@ class CreateBlogFragment : BaseCreateBlogFragment() {
 
             viewState.blogFields.let { newBlogFields ->
                 setBlogProperties(
-                    newBlogFields.blogPost?.title,
-                    newBlogFields.blogPost?.body,
-                    newBlogFields.image?.toString()
+                    newBlogFields.title,
+                    newBlogFields.body,
+                    newBlogFields.image.toString()
                 )
             }
         })
@@ -162,9 +160,11 @@ class CreateBlogFragment : BaseCreateBlogFragment() {
 
     override fun onPause() {
         super.onPause()
-        viewModel.setNewBody(blog_body.text.toString())
-        viewModel.setNewTitle(blog_title.text.toString())
-
+        viewModel.setNewBlogFields(
+            blog_title.text.toString(),
+            blog_body.text.toString(),
+            null
+        )
     }
 
     private fun publishNewBlog() {

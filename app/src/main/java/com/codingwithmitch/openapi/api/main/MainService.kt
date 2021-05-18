@@ -271,7 +271,7 @@ class MainService(
 
             var result: DataState<CreateBlogViewState> =
                 DataState.data(
-                    CreateBlogViewState(CreateBlogViewState.NewBlogFields(blogPost, null)),
+                    CreateBlogViewState(CreateBlogViewState.NewBlogFields(blogPost, null, null, null)),
                     Response(SUCCESS_CREATE, ResponseType.Toast)
                 )
 
