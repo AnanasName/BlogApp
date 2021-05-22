@@ -37,11 +37,11 @@ class AccountFragment : BaseAccountFragment() {
         subscribeObservers()
     }
 
-    private fun subscribeObservers(){
+    private fun subscribeObservers() {
         viewModel.dataState.observe(viewLifecycleOwner, Observer { dataState ->
-            stateChangeListener.onDataStateChange(dataState)
-            dataState?.let {
-                it.data?.let { data ->
+            if (dataState != null) {
+                stateChangeListener.onDataStateChange(dataState)
+                dataState.data?.let { data ->
                     data.data?.let { event ->
                         event.getContentIfNotHandled()?.let { viewState ->
                             viewState.accountProperties?.let { accountProperties ->
@@ -69,7 +69,7 @@ class AccountFragment : BaseAccountFragment() {
         )
     }
 
-    private fun setAccountDataFields(accountProperties: AccountProperties){
+    private fun setAccountDataFields(accountProperties: AccountProperties) {
         email?.setText(accountProperties.email)
         username?.setText(accountProperties.username)
     }
@@ -80,7 +80,7 @@ class AccountFragment : BaseAccountFragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
+        when (item.itemId) {
             R.id.edit -> {
                 findNavController().navigate(R.id.action_accountFragment_to_updateAccountFragment)
                 return true

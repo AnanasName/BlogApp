@@ -60,9 +60,22 @@ class BlogFragment : BaseBlogFragment(),
 
         subscribeObservers()
         initRecyclerView()
+    }
 
-        if (savedInstanceState == null)
-            viewModel.loadFirstPage()
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshBlogList()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        saveLayoutManagerState()
+    }
+
+    private fun saveLayoutManagerState(){
+        blog_post_recyclerview.layoutManager?.onSaveInstanceState()?.let { lmState ->
+            viewModel.setLayoutManagerState(lmState)
+        }
     }
 
     private fun onBlogSearchOrFilter(){
@@ -93,13 +106,12 @@ class BlogFragment : BaseBlogFragment(),
         })
 
         viewModel.viewState.observe(viewLifecycleOwner, Observer { viewState ->
-            Log.d("DEBUG", "BlogFragment: viewState: ${viewState}")
             if (viewState != null){
 
                 recyclerAdapter.apply {
 
                     preloadGlideImages(
-                        requestManager,
+                        dependencyProvider.getGlideRequestManager(),
                         viewState.blogFields.blogList
                     )
 
@@ -166,7 +178,7 @@ class BlogFragment : BaseBlogFragment(),
             addItemDecoration(topSpacingItemDecoration)
             recyclerAdapter = BlogListAdapter(
                 this@BlogFragment,
-                requestManager
+                dependencyProvider.getGlideRequestManager()
             )
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -190,6 +202,12 @@ class BlogFragment : BaseBlogFragment(),
     override fun onItemSelected(position: Int, item: BlogPost) {
         viewModel.setBlogPost(item)
         findNavController().navigate(R.id.action_blogFragment_to_viewBlogFragment)
+    }
+
+    override fun restoreListPosition() {
+        viewModel.viewState.value?.blogFields?.layoutManagerState?.let {lmState ->
+            blog_post_recyclerview?.layoutManager?.onRestoreInstanceState(lmState)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

@@ -3,13 +3,15 @@ package com.codingwithmitch.openapi.ui.auth
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import com.codingwithmitch.openapi.di.Injectable
 import com.codingwithmitch.openapi.viewmodels.ViewModelProviderFactory
 import dagger.android.support.DaggerFragment
 import javax.inject.Inject
 
-abstract class BaseAuthFragment: DaggerFragment() {
+abstract class BaseAuthFragment: Fragment(), Injectable {
 
     @Inject
     lateinit var providerFactory: ViewModelProviderFactory

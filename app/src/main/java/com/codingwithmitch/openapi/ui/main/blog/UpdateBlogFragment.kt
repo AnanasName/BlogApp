@@ -43,13 +43,13 @@ class UpdateBlogFragment : BaseBlogFragment() {
         setHasOptionsMenu(true)
 
         blog_image.setOnClickListener {
-            if (stateChangeListener.isStoragePermissionGranted()){
+            if (stateChangeListener.isStoragePermissionGranted()) {
                 pickFromGallery()
             }
         }
 
         update_textview.setOnClickListener {
-            if (stateChangeListener.isStoragePermissionGranted()){
+            if (stateChangeListener.isStoragePermissionGranted()) {
                 pickFromGallery()
             }
         }
@@ -57,31 +57,32 @@ class UpdateBlogFragment : BaseBlogFragment() {
         subscribeObservers()
     }
 
-    private fun subscribeObservers(){
+    private fun subscribeObservers() {
         viewModel.dataState.observe(viewLifecycleOwner, Observer { dataState ->
 
-            stateChangeListener.onDataStateChange(dataState)
-
-            dataState.data?.let { data ->
-                data.response?.let { event ->
-                    if (event.peekContent().message.equals(SUCCESS_UPDATED)){
-                        findNavController().popBackStack()
+            if (dataState != null) {
+                stateChangeListener.onDataStateChange(dataState)
+                dataState.data?.let { data ->
+                    data.response?.let { event ->
+                        if (event.peekContent().message.equals(SUCCESS_UPDATED)) {
+                            findNavController().popBackStack()
+                        }
                     }
                 }
             }
+        })
 
-            viewModel.viewState.observe(viewLifecycleOwner, Observer{ viewState ->
-                viewState.updateBlogFields.let { updateBlogFields ->
-                    setBlog(
-                        updateBlogFields.blogPost!!
-                    )
-                }
-            })
+        viewModel.viewState.observe(viewLifecycleOwner, Observer { viewState ->
+            viewState.updateBlogFields.let { updateBlogFields ->
+                setBlog(
+                    updateBlogFields.blogPost!!
+                )
+            }
         })
     }
 
     private fun setBlog(blogPost: BlogPost) {
-        requestManager
+        dependencyProvider.getGlideRequestManager()
             .load(blogPost.image)
             .into(blog_image)
         blog_title.setText(blogPost.title)
@@ -93,7 +94,7 @@ class UpdateBlogFragment : BaseBlogFragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
+        when (item.itemId) {
             R.id.save -> {
                 val callback: AreYouSureCallback = object : AreYouSureCallback {
                     override fun proceed() {

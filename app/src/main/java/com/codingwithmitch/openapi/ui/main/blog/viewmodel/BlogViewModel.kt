@@ -64,7 +64,12 @@ constructor(
         when (stateEvent) {
 
             is BlogSearchEvent -> {
-                performGetBlogPosts(stateEvent)
+                clearLayoutManagerState()
+                performGetBlogPosts()
+            }
+
+            is RestoreBlogList -> {
+                performGetBlogPosts()
             }
 
             is CheckAuthorOfBlogPost -> {
@@ -99,7 +104,7 @@ constructor(
         cancelActiveJobs()
     }
 
-    private fun performGetBlogPosts(stateEvent: BlogSearchEvent) {
+    private fun performGetBlogPosts() {
         initNewJob()
 
         blogRepository.addJob("performGetBlogPosts", job)
@@ -138,6 +143,16 @@ constructor(
                 event.peekContent().blogFields.blogList.forEach { blogPost ->
                     launch {
                         blogRepository.insertBlogPostToDatabase(blogPost)
+                    }
+                }
+            }
+
+            cachingData.forEach {cacheBlogPost ->
+                result.data?.data?.let { event ->
+                    if (!event.peekContent().blogFields.blogList.contains(cacheBlogPost)) {
+                        launch {
+                            blogRepository.deleteBlogPostFromDatabase(cacheBlogPost)
+                        }
                     }
                 }
             }

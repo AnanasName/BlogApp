@@ -54,14 +54,18 @@ class CreateBlogFragment : BaseCreateBlogFragment() {
 
     private fun subscribeObservers() {
         viewModel.dataState.observe(viewLifecycleOwner, Observer { dataState ->
-            stateChangeListener.onDataStateChange(dataState)
 
-            dataState.data?.let { data ->
-                data.response?.let { event ->
-                    event.peekContent().let { response ->
-                        response.message?.let { message ->
-                            if (message.equals(SUCCESS_CREATE)){
-                                viewModel.clearNewBlogFields()
+            if (dataState != null) {
+
+                stateChangeListener.onDataStateChange(dataState)
+
+                dataState.data?.let { data ->
+                    data.response?.let { event ->
+                        event.peekContent().let { response ->
+                            response.message?.let { message ->
+                                if (message.equals(SUCCESS_CREATE)) {
+                                    viewModel.clearNewBlogFields()
+                                }
                             }
                         }
                     }
@@ -83,7 +87,7 @@ class CreateBlogFragment : BaseCreateBlogFragment() {
 
     private fun setBlogProperties(title: String?, body: String?, image: String?) {
         image?.let {
-            requestManager
+            dependencyProvider.getGlideRequestManager()
                 .load(image)
                 .into(blog_image)
         } ?: setDefaultImage()
@@ -93,7 +97,7 @@ class CreateBlogFragment : BaseCreateBlogFragment() {
     }
 
     private fun setDefaultImage() {
-        requestManager
+        dependencyProvider.getGlideRequestManager()
             .load(R.drawable.default_image)
             .into(blog_image)
     }
@@ -187,7 +191,7 @@ class CreateBlogFragment : BaseCreateBlogFragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
+        when (item.itemId) {
             R.id.publish -> {
                 val callback: AreYouSureCallback = object : AreYouSureCallback {
                     override fun proceed() {

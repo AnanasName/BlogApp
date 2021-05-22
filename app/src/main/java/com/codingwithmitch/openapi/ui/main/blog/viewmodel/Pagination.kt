@@ -1,6 +1,7 @@
 package com.codingwithmitch.openapi.ui.main.blog.viewmodel
 
 import android.util.Log
+import com.codingwithmitch.openapi.ui.main.blog.state.BlogStateEvent
 import com.codingwithmitch.openapi.ui.main.blog.state.BlogStateEvent.BlogSearchEvent
 import com.codingwithmitch.openapi.ui.main.blog.state.BlogViewState
 
@@ -8,6 +9,12 @@ fun BlogViewModel.resetPage(){
     val update = getCurrentViewStateOrNew()
     update.blogFields.page = 1
     setViewState(update)
+}
+
+fun BlogViewModel.refreshBlogList(){
+    setQueryInProgress(true)
+    setQueryExhausted(false)
+    setStateEvent(BlogStateEvent.RestoreBlogList)
 }
 
 fun BlogViewModel.loadFirstPage(){

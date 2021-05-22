@@ -1,5 +1,7 @@
 package com.codingwithmitch.openapi.ui.main.blog.viewmodel
 
+import android.os.Parcel
+import android.os.Parcelable
 import android.util.Log
 import com.codingwithmitch.openapi.models.BlogPost
 
@@ -14,6 +16,12 @@ fun BlogViewModel.setQuery(query: String) {
 fun BlogViewModel.setBlogListData(blogList: List<BlogPost>) {
     val update = getCurrentViewStateOrNew()
     update.blogFields.blogList = blogList
+    setViewState(update)
+}
+
+fun BlogViewModel.clearLayoutManagerState() {
+    val update = getCurrentViewStateOrNew()
+    update.blogFields.layoutManagerState = null
     setViewState(update)
 }
 
@@ -77,6 +85,12 @@ fun BlogViewModel.setUpdatedBlogPost(
         Log.d("SMG", updatedBlogFields.blogPost?.image)
     }
     update.updateBlogFields = updatedBlogFields
+    setViewState(update)
+}
+
+fun BlogViewModel.setLayoutManagerState(layoutManagerState: Parcelable){
+    val update = getCurrentViewStateOrNew()
+    update.blogFields.layoutManagerState = layoutManagerState
     setViewState(update)
 }
 

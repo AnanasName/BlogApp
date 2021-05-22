@@ -5,27 +5,32 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import com.bumptech.glide.RequestManager
 import com.codingwithmitch.openapi.R
+import com.codingwithmitch.openapi.di.Injectable
 import com.codingwithmitch.openapi.ui.DataStateChangeListener
 import com.codingwithmitch.openapi.ui.UICommunicationListener
+import com.codingwithmitch.openapi.ui.main.MainDependencyProvider
+import com.codingwithmitch.openapi.ui.main.account.AccountViewModel
+import com.codingwithmitch.openapi.ui.main.account.state.ACCOUNT_VIEW_STATE_BUNDLE_KEY
+import com.codingwithmitch.openapi.ui.main.account.state.AccountViewState
+import com.codingwithmitch.openapi.ui.main.blog.state.BLOG_VIEW_STATE_BUNDLE_KEY
+import com.codingwithmitch.openapi.ui.main.create_blog.state.CREATE_BLOG_VIEW_STATE_BUNDLE_KEY
+import com.codingwithmitch.openapi.ui.main.create_blog.state.CreateBlogViewState
 import com.codingwithmitch.openapi.viewmodels.ViewModelProviderFactory
 import dagger.android.support.DaggerFragment
 import java.lang.ClassCastException
 import java.lang.Exception
 import javax.inject.Inject
 
-abstract class BaseCreateBlogFragment : DaggerFragment(){
+abstract class BaseCreateBlogFragment : Fragment(), Injectable {
 
-    @Inject
-    lateinit var requestManager: RequestManager
-
-    @Inject
-    lateinit var providerFactory: ViewModelProviderFactory
+    lateinit var dependencyProvider: MainDependencyProvider
 
     lateinit var stateChangeListener: DataStateChangeListener
 
@@ -37,11 +42,39 @@ abstract class BaseCreateBlogFragment : DaggerFragment(){
         super.onViewCreated(view, savedInstanceState)
         setupActionBarWithNavController(R.id.createBlogFragment, activity as AppCompatActivity)
 
+
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
         viewModel = activity?.run{
-            ViewModelProvider(this, providerFactory).get(CreateBlogViewModel::class.java)
+            ViewModelProvider(this, dependencyProvider.getViewModelProviderFactory()).get(CreateBlogViewModel::class.java)
         } ?: throw Exception("Invalid Activity")
 
         cancelActiveJobs()
+
+        savedInstanceState?.let { inState ->
+            (inState[CREATE_BLOG_VIEW_STATE_BUNDLE_KEY] as CreateBlogViewState)?.let { viewState ->
+                viewModel.setViewState(viewState)
+            }
+        }
+    }
+
+    fun isViewModelInitialized() = ::viewModel.isInitialized
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        Log.d("SMG", "Yes")
+        Log.d("SMG", viewModel.viewState.value?.blogFields?.title)
+        if (isViewModelInitialized()) {
+
+            outState.putParcelable(
+                CREATE_BLOG_VIEW_STATE_BUNDLE_KEY,
+                viewModel.viewState.value
+            )
+        }
+
+        super.onSaveInstanceState(outState)
     }
 
     fun cancelActiveJobs(){
@@ -67,6 +100,12 @@ abstract class BaseCreateBlogFragment : DaggerFragment(){
 
         try{
             uiCommunicationListener = context as UICommunicationListener
+        }catch(e: ClassCastException){
+            Log.e("DEBUG", "$context must implement DataStateChangeListener" )
+        }
+
+        try{
+            dependencyProvider = context as MainDependencyProvider
         }catch(e: ClassCastException){
             Log.e("DEBUG", "$context must implement DataStateChangeListener" )
         }

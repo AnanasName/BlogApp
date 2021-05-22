@@ -21,6 +21,7 @@ import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 const val CHANGES_APPLIED = "Changes Applied"
 const val BLOG_POSTS_COLLECTION = "blog_posts"
@@ -132,7 +133,7 @@ class MainService(
     ): DataState<BlogViewState> {
         return safeApiCall {
 
-            val queryList: List<BlogPost>
+            var queryList: List<BlogPost> = ArrayList()
 
             var result: DataState<BlogViewState> =
                 DataState.error(Response("Error occurred", ResponseType.Dialog))
@@ -157,6 +158,18 @@ class MainService(
                 )
             }
 
+            queryList.forEach { blogPost ->
+                blogPost.authorPk.let { authorPk ->
+                    val networkUsername = checkUsername(authorPk)
+                    if (!blogPost.username.equals(networkUsername)) {
+                        if (networkUsername != null) {
+                            blogPost.username = networkUsername
+                            changeBlogPostUsername(networkUsername, authorPk)
+                        }
+                    }
+                }
+            }
+
 
             result
         }
@@ -179,6 +192,18 @@ class MainService(
                 }
                 .await()
                 .toObjects(BlogPost::class.java)
+
+            blogList.forEach { blogPost ->
+                blogPost.authorPk.let { authorPk ->
+                    val networkUsername = checkUsername(authorPk)
+                    if (!blogPost.username.equals(networkUsername)) {
+                        if (networkUsername != null) {
+                            blogPost.username = networkUsername
+                            changeBlogPostUsername(networkUsername, authorPk)
+                        }
+                    }
+                }
+            }
 
             if (!hasErrors) {
                 result = DataState.data(
@@ -271,7 +296,14 @@ class MainService(
 
             var result: DataState<CreateBlogViewState> =
                 DataState.data(
-                    CreateBlogViewState(CreateBlogViewState.NewBlogFields(blogPost, null, null, null)),
+                    CreateBlogViewState(
+                        CreateBlogViewState.NewBlogFields(
+                            blogPost,
+                            null,
+                            null,
+                            null
+                        )
+                    ),
                     Response(SUCCESS_CREATE, ResponseType.Toast)
                 )
 
@@ -286,6 +318,36 @@ class MainService(
 
             result
         }
+    }
+
+    private suspend fun checkUsername(authorPk: String): String? {
+
+        return firebaseFirestore
+            .collection(USERS_COLLECTION)
+            .document(authorPk)
+            .get()
+            .await()
+            .toObject(AccountProperties::class.java)?.username
+
+    }
+
+    private suspend fun changeBlogPostUsername(newUsername: String, authorPk: String) {
+
+        val accountProperties = firebaseFirestore
+            .collection(USERS_COLLECTION)
+            .document(authorPk)
+            .get()
+            .await()
+            .toObject(AccountProperties::class.java)
+
+        accountProperties?.username = newUsername
+
+        firebaseFirestore
+            .collection(USERS_COLLECTION)
+            .document(authorPk)
+            .set(accountProperties!!)
+            .await()
+
     }
 
     private suspend fun uploadImage(blogPk: String, imageUri: Uri): String {

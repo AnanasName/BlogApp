@@ -6,6 +6,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
+import com.bumptech.glide.RequestManager
 import com.codingwithmitch.openapi.R
 import com.codingwithmitch.openapi.ui.BaseActivity
 import com.codingwithmitch.openapi.ui.auth.AuthActivity
@@ -19,17 +20,34 @@ import com.codingwithmitch.openapi.ui.main.create_blog.BaseCreateBlogFragment
 import com.codingwithmitch.openapi.util.BottomNavController
 import com.codingwithmitch.openapi.util.BottomNavController.*
 import com.codingwithmitch.openapi.util.setupNavigation
+import com.codingwithmitch.openapi.viewmodels.ViewModelProviderFactory
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import kotlinx.android.synthetic.main.activity_main.*
+import javax.inject.Inject
 
 
 class MainActivity : BaseActivity(),
     NavGraphProvider,
     OnNavigationGraphChanged,
-    OnNavigationReselectedListener {
+    OnNavigationReselectedListener,
+    MainDependencyProvider {
+
+    @Inject
+    lateinit var requestManager: RequestManager
+
+    @Inject
+    lateinit var providerFactory: ViewModelProviderFactory
+
+    override fun expandAppbar() {
+        findViewById<AppBarLayout>(R.id.app_bar).setExpanded(true)
+    }
+
+    override fun getViewModelProviderFactory() = providerFactory
+
+    override fun getGlideRequestManager() = requestManager
 
     private lateinit var bottomNavigationView: BottomNavigationView
 
@@ -174,10 +192,6 @@ class MainActivity : BaseActivity(),
         else -> {
 
         }
-    }
-
-    override fun expandAppbar() {
-        findViewById<AppBarLayout>(R.id.app_bar).setExpanded(true)
     }
 
 }
