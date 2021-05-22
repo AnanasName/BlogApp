@@ -2,6 +2,7 @@ package com.codingwithmitch.openapi.ui.main
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.view.MenuItem
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -17,6 +18,7 @@ import com.codingwithmitch.openapi.ui.main.blog.BaseBlogFragment
 import com.codingwithmitch.openapi.ui.main.blog.UpdateBlogFragment
 import com.codingwithmitch.openapi.ui.main.blog.ViewBlogFragment
 import com.codingwithmitch.openapi.ui.main.create_blog.BaseCreateBlogFragment
+import com.codingwithmitch.openapi.util.BOTTOM_NAV_BACKSTACK_KEY
 import com.codingwithmitch.openapi.util.BottomNavController
 import com.codingwithmitch.openapi.util.BottomNavController.*
 import com.codingwithmitch.openapi.util.setupNavigation
@@ -68,17 +70,32 @@ class MainActivity : BaseActivity(),
         setContentView(R.layout.activity_main)
 
         setupActionBar()
-        bottomNavigationView = findViewById(R.id.bottom_navigation_view)
-        bottomNavigationView.setupNavigation(bottomNavController, this)
-        if (savedInstanceState == null)
-            bottomNavController.onNavigationItemSelected()
+        setupBottomNavigationView(savedInstanceState)
 
         subscribeObservers()
 
         checkIsLogged()
     }
 
+    private fun setupBottomNavigationView(savedInstanceState: Bundle?){
+        bottomNavigationView = findViewById(R.id.bottom_navigation_view)
+        bottomNavigationView.setupNavigation(bottomNavController, this)
+        if (savedInstanceState == null) {
+            bottomNavController.setupBottomNavigationBackStack(null)
+            bottomNavController.onNavigationItemSelected()
+        }else{
+            (savedInstanceState[BOTTOM_NAV_BACKSTACK_KEY] as IntArray?)?.let {items ->
+                val backstack = BackStack()
+                backstack.addAll(items.toTypedArray())
+                bottomNavController.setupBottomNavigationBackStack(backstack)
+            }
+        }
+    }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putIntArray(BOTTOM_NAV_BACKSTACK_KEY, bottomNavController.navigationBackStack.toIntArray())
+        super.onSaveInstanceState(outState)
+    }
 
     private fun checkIsLogged() {
         if (!sessionManager.isLogged())
