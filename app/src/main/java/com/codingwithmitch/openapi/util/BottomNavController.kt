@@ -1,5 +1,6 @@
 package com.codingwithmitch.openapi.util
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.os.Parcelable
@@ -12,6 +13,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import com.codingwithmitch.openapi.R
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.parcel.Parcelize
@@ -69,13 +71,14 @@ class BottomNavController(
         return true
     }
 
+    @SuppressLint("RestrictedApi")
     fun onBackPressed(){
-        val childFragmentManager = fragmentManager.findFragmentById(containerId)!!
-            .childFragmentManager
+        val navController: NavController = fragmentManager.findFragmentById(containerId)!!
+            .findNavController()
 
         when{
-            childFragmentManager.popBackStackImmediate() ->{
-
+            navController.backStack.size > 2 -> {
+                navController.popBackStack()
             }
 
             navigationBackStack.size > 1 -> {
