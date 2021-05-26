@@ -5,13 +5,11 @@ import android.app.Activity
 import android.content.Context
 import android.os.Parcelable
 import androidx.annotation.IdRes
-import androidx.annotation.NavigationRes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.codingwithmitch.openapi.R
 import com.codingwithmitch.openapi.fragments.main.account.AccountNavHostFragment
@@ -20,7 +18,7 @@ import com.codingwithmitch.openapi.fragments.main.create_blog.CreateBlogNavHostF
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.parcel.Parcelize
 
-const val BOTTOM_NAV_BACKSTACK_KEY = "openapi.util.BottomNavController.BackStack"
+  const val BOTTOM_NAV_BACKSTACK_KEY = "openapi.util.BottomNavController.BackStack"
 
 class BottomNavController(
     val context: Context,

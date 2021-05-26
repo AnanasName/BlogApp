@@ -3,12 +3,7 @@ package com.codingwithmitch.openapi.fragments.main.account
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
 import androidx.lifecycle.ViewModelProvider
-import com.codingwithmitch.openapi.di.auth.AuthScope
 import com.codingwithmitch.openapi.di.main.MainScope
-import com.codingwithmitch.openapi.ui.auth.ForgotPasswordFragment
-import com.codingwithmitch.openapi.ui.auth.LauncherFragment
-import com.codingwithmitch.openapi.ui.auth.LoginFragment
-import com.codingwithmitch.openapi.ui.auth.RegisterFragment
 import com.codingwithmitch.openapi.ui.main.account.AccountFragment
 import com.codingwithmitch.openapi.ui.main.account.ChangePasswordFragment
 import com.codingwithmitch.openapi.ui.main.account.UpdateAccountFragment

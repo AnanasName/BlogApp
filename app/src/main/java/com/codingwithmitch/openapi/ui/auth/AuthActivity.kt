@@ -7,15 +7,11 @@ import androidx.activity.viewModels
 import androidx.fragment.app.FragmentFactory
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavController
-import androidx.navigation.NavDestination
 import com.codingwithmitch.openapi.BaseApplication
 import com.codingwithmitch.openapi.R
-import com.codingwithmitch.openapi.fragments.auth.AuthFragmentFactory
 import com.codingwithmitch.openapi.fragments.auth.AuthNavHostFragment
 import com.codingwithmitch.openapi.ui.BaseActivity
 import com.codingwithmitch.openapi.ui.main.MainActivity
-import com.codingwithmitch.openapi.viewmodels.AuthViewModelFactory
 import kotlinx.android.synthetic.main.activity_auth.*
 import javax.inject.Inject
 

@@ -3,7 +3,10 @@ package com.codingwithmitch.openapi.ui.main.blog
 import android.content.ContentValues.TAG
 import android.os.Bundle
 import android.util.Log
-import android.view.*
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
