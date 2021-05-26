@@ -1,12 +1,12 @@
 package com.codingwithmitch.openapi.repository
 
 import androidx.lifecycle.LiveData
-import kotlinx.coroutines.*
 import androidx.lifecycle.MediatorLiveData
 import com.codingwithmitch.openapi.ui.DataState
 import com.codingwithmitch.openapi.ui.Response
 import com.codingwithmitch.openapi.ui.ResponseType
 import com.codingwithmitch.openapi.util.GenericApiResponse
+import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 

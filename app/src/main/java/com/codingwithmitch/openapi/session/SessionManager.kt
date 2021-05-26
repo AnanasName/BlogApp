@@ -15,8 +15,7 @@ class SessionManager
 constructor(
     val application: Application,
     private val firebaseAuth: FirebaseAuth
-)
-{
+) {
 
     fun getId(): String?{
         return firebaseAuth.uid

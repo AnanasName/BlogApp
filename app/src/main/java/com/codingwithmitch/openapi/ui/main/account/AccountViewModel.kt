@@ -11,7 +11,7 @@ import com.codingwithmitch.openapi.ui.ResponseType
 import com.codingwithmitch.openapi.ui.main.account.state.AccountStateEvent
 import com.codingwithmitch.openapi.ui.main.account.state.AccountStateEvent.*
 import com.codingwithmitch.openapi.ui.main.account.state.AccountViewState
-import kotlinx.coroutines.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class AccountViewModel

@@ -1,6 +1,5 @@
 package com.codingwithmitch.openapi.ui.main.blog.viewmodel
 
-import android.os.Parcel
 import android.os.Parcelable
 import android.util.Log
 import com.codingwithmitch.openapi.models.BlogPost

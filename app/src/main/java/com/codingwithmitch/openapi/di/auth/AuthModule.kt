@@ -11,8 +11,9 @@ import dagger.Module
 import dagger.Provides
 
 @Module
-class AuthModule {
+object AuthModule {
 
+    @JvmStatic
     @AuthScope
     @Provides
     fun provideApiService(
@@ -31,6 +32,7 @@ class AuthModule {
         )
     }
 
+    @JvmStatic
     @AuthScope
     @Provides
     fun provideAuthRepository(

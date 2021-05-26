@@ -2,12 +2,13 @@ package com.codingwithmitch.openapi.ui.main
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.view.MenuItem
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentFactory
 import androidx.navigation.NavController
 import com.bumptech.glide.RequestManager
+import com.codingwithmitch.openapi.BaseApplication
 import com.codingwithmitch.openapi.R
 import com.codingwithmitch.openapi.ui.BaseActivity
 import com.codingwithmitch.openapi.ui.auth.AuthActivity
@@ -22,34 +23,34 @@ import com.codingwithmitch.openapi.util.BOTTOM_NAV_BACKSTACK_KEY
 import com.codingwithmitch.openapi.util.BottomNavController
 import com.codingwithmitch.openapi.util.BottomNavController.*
 import com.codingwithmitch.openapi.util.setupNavigation
-import com.codingwithmitch.openapi.viewmodels.ViewModelProviderFactory
+import com.codingwithmitch.openapi.viewmodels.AuthViewModelFactory
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
+import javax.inject.Named
 
 
 class MainActivity : BaseActivity(),
-    NavGraphProvider,
     OnNavigationGraphChanged,
-    OnNavigationReselectedListener,
-    MainDependencyProvider {
+    OnNavigationReselectedListener{
 
     @Inject
-    lateinit var requestManager: RequestManager
+    @Named("AccountFragmentFactory")
+    lateinit var accountFragmentFactory: FragmentFactory
 
     @Inject
-    lateinit var providerFactory: ViewModelProviderFactory
+    @Named("BlogFragmentFactory")
+    lateinit var blogFragmentFactory: FragmentFactory
+
+    @Inject
+    @Named("CreateBlogFragmentFactory")
+    lateinit var createBlogFragmentFactory: FragmentFactory
 
     override fun expandAppbar() {
         findViewById<AppBarLayout>(R.id.app_bar).setExpanded(true)
     }
-
-    override fun getViewModelProviderFactory() = providerFactory
-
-    override fun getGlideRequestManager() = requestManager
 
     private lateinit var bottomNavigationView: BottomNavigationView
 
@@ -57,13 +58,17 @@ class MainActivity : BaseActivity(),
         BottomNavController(
             this,
             R.id.main_nav_host_fragment,
-            R.id.nav_blog,
-            this,
+            R.id.menu_nav_blog,
             this
         )
     }
 
     lateinit var authListener: AuthStateListener
+
+    override fun inject() {
+        (application as BaseApplication).mainComponent()
+            .inject(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -110,6 +115,7 @@ class MainActivity : BaseActivity(),
         val intent = Intent(this, AuthActivity::class.java)
         startActivity(intent)
         finish()
+        (application as BaseApplication).releaseMainComponent()
     }
 
     private fun setAuthListener() {
@@ -145,25 +151,6 @@ class MainActivity : BaseActivity(),
     }
 
     override fun onBackPressed() = bottomNavController.onBackPressed()
-
-    override fun getNavGraphId(itemId: Int) = when(itemId){
-
-        R.id.nav_blog -> {
-            R.navigation.nav_blog
-        }
-
-        R.id.nav_account -> {
-            R.navigation.nav_account
-        }
-
-        R.id.nav_create_blog -> {
-            R.navigation.nav_create_blog
-        }
-
-        else -> {
-            R.navigation.nav_blog
-        }
-    }
 
     override fun onGraphChange() {
         expandAppbar()

@@ -3,13 +3,14 @@ package com.codingwithmitch.openapi.ui
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Bundle
 import android.util.Log
 import android.view.inputmethod.InputMethodManager
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.codingwithmitch.openapi.session.SessionManager
 import com.codingwithmitch.openapi.util.Constants.Companion.PERMISSIONS_REQUEST_READ_STORE
-import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -17,10 +18,17 @@ import javax.inject.Inject
 
 
 
-abstract class BaseActivity : DaggerAppCompatActivity(), DataStateChangeListener,
+abstract class BaseActivity : AppCompatActivity(), DataStateChangeListener,
 UICommunicationListener{
 
     private val TAG = "BaseActivity"
+
+    abstract fun inject()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        inject()
+        super.onCreate(savedInstanceState)
+    }
 
     @Inject
     lateinit var sessionManager: SessionManager

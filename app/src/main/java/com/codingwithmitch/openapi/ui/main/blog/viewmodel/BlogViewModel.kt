@@ -2,7 +2,6 @@ package com.codingwithmitch.openapi.ui.main.blog.viewmodel
 
 import android.content.SharedPreferences
 import android.net.Uri
-import android.util.Log
 import androidx.core.net.toUri
 import com.codingwithmitch.openapi.api.main.SUCCESS_DELETED
 import com.codingwithmitch.openapi.api.main.SUCCESS_UPDATED
@@ -19,7 +18,6 @@ import com.codingwithmitch.openapi.ui.main.blog.state.BlogViewState
 import com.codingwithmitch.openapi.util.Constants.Companion.PAGINATION_PAGE_SIZE
 import com.codingwithmitch.openapi.util.PreferencesKeys.Companion.BLOG_FILTER
 import com.codingwithmitch.openapi.util.PreferencesKeys.Companion.BLOG_ORDER
-import kotlinx.android.synthetic.main.fragment_update_blog.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

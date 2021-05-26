@@ -15,8 +15,9 @@ import dagger.Module
 import dagger.Provides
 
 @Module
-class MainModule {
+object MainModule {
 
+    @JvmStatic
     @MainScope
     @Provides
     fun provideMainApiService(
@@ -26,6 +27,7 @@ class MainModule {
         return MainService(firebaseFirestore, firebaseReference)
     }
 
+    @JvmStatic
     @MainScope
     @Provides
     fun provideAccountRepository(
@@ -40,12 +42,14 @@ class MainModule {
         )
     }
 
+    @JvmStatic
     @MainScope
     @Provides
     fun provideFirebaseStorage(): FirebaseStorage {
         return FirebaseStorage.getInstance()
     }
 
+    @JvmStatic
     @MainScope
     @Provides
     fun provideStorageReference(
@@ -54,12 +58,14 @@ class MainModule {
         return firebaseStorage.getReference()
     }
 
+    @JvmStatic
     @MainScope
     @Provides
     fun provideBlogPostDao(db: AppDatabase): BlogPostDao {
         return db.getBlogDao()
     }
 
+    @JvmStatic
     @MainScope
     @Provides
     fun provideBlogRepository(
@@ -70,6 +76,7 @@ class MainModule {
         return BlogRepository(mainService, blogPostDao, sessionManager)
     }
 
+    @JvmStatic
     @MainScope
     @Provides
     fun provideCreateBlogRepository(

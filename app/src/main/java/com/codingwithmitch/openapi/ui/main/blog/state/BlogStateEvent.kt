@@ -1,7 +1,6 @@
 package com.codingwithmitch.openapi.ui.main.blog.state
 
 import android.net.Uri
-import okhttp3.MultipartBody
 
 sealed class BlogStateEvent {
 

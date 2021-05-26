@@ -1,6 +1,7 @@
  package com.codingwithmitch.openapi.repository.main
 
 import com.codingwithmitch.openapi.api.main.MainService
+import com.codingwithmitch.openapi.di.main.MainScope
 import com.codingwithmitch.openapi.models.BlogPost
 import com.codingwithmitch.openapi.persistence.BlogPostDao
 import com.codingwithmitch.openapi.persistence.returnOrderedBlogQuery
@@ -10,6 +11,7 @@ import com.codingwithmitch.openapi.ui.DataState
 import com.codingwithmitch.openapi.ui.main.blog.state.BlogViewState
 import javax.inject.Inject
 
+@MainScope
 class BlogRepository
 @Inject
 constructor(

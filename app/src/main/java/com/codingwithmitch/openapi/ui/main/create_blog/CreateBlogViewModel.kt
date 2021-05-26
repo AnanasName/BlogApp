@@ -1,10 +1,7 @@
 package com.codingwithmitch.openapi.ui.main.create_blog
 
 import android.net.Uri
-import android.util.Log
-import androidx.core.net.toUri
 import com.codingwithmitch.openapi.api.main.SUCCESS_CREATE
-import com.codingwithmitch.openapi.api.main.SUCCESS_UPDATED
 import com.codingwithmitch.openapi.models.BlogPost
 import com.codingwithmitch.openapi.repository.main.CreateBlogRepository
 import com.codingwithmitch.openapi.session.SessionManager
@@ -12,12 +9,10 @@ import com.codingwithmitch.openapi.ui.BaseViewModel
 import com.codingwithmitch.openapi.ui.DataState
 import com.codingwithmitch.openapi.ui.Response
 import com.codingwithmitch.openapi.ui.ResponseType
-import com.codingwithmitch.openapi.ui.main.blog.state.BlogStateEvent
-import com.codingwithmitch.openapi.ui.main.blog.state.BlogViewState
 import com.codingwithmitch.openapi.ui.main.create_blog.state.CreateBlogStateEvent
 import com.codingwithmitch.openapi.ui.main.create_blog.state.CreateBlogStateEvent.CreateNewBlogEvent
 import com.codingwithmitch.openapi.ui.main.create_blog.state.CreateBlogViewState
-import com.codingwithmitch.openapi.ui.main.create_blog.state.CreateBlogViewState.*
+import com.codingwithmitch.openapi.ui.main.create_blog.state.CreateBlogViewState.NewBlogFields
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

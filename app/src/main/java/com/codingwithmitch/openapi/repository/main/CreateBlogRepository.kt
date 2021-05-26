@@ -2,16 +2,16 @@ package com.codingwithmitch.openapi.repository.main
 
 import android.net.Uri
 import com.codingwithmitch.openapi.api.main.MainService
-import com.codingwithmitch.openapi.models.AuthToken
+import com.codingwithmitch.openapi.di.main.MainScope
 import com.codingwithmitch.openapi.models.BlogPost
 import com.codingwithmitch.openapi.persistence.BlogPostDao
 import com.codingwithmitch.openapi.repository.JobManager
 import com.codingwithmitch.openapi.session.SessionManager
 import com.codingwithmitch.openapi.ui.DataState
-import com.codingwithmitch.openapi.ui.main.blog.state.BlogViewState
 import com.codingwithmitch.openapi.ui.main.create_blog.state.CreateBlogViewState
 import javax.inject.Inject
 
+@MainScope
 class CreateBlogRepository
 @Inject
 constructor(

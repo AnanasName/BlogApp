@@ -4,30 +4,67 @@ import android.content.ContentValues.TAG
 import android.os.Bundle
 import android.util.Log
 import android.view.*
-import androidx.core.net.toUri
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.RequestManager
 import com.codingwithmitch.openapi.R
 import com.codingwithmitch.openapi.api.main.SUCCESS_DELETED
+import com.codingwithmitch.openapi.di.main.MainScope
 import com.codingwithmitch.openapi.models.BlogPost
 import com.codingwithmitch.openapi.ui.AreYouSureCallback
 import com.codingwithmitch.openapi.ui.UIMessage
 import com.codingwithmitch.openapi.ui.UIMessageType
-import com.codingwithmitch.openapi.ui.main.blog.state.BlogStateEvent
+import com.codingwithmitch.openapi.ui.main.blog.state.BLOG_VIEW_STATE_BUNDLE_KEY
 import com.codingwithmitch.openapi.ui.main.blog.state.BlogStateEvent.CheckAuthorOfBlogPost
 import com.codingwithmitch.openapi.ui.main.blog.state.BlogStateEvent.DeleteBlogPostEvent
+import com.codingwithmitch.openapi.ui.main.blog.state.BlogViewState
 import com.codingwithmitch.openapi.ui.main.blog.viewmodel.*
 import kotlinx.android.synthetic.main.fragment_view_blog.*
-import java.lang.Exception
+import javax.inject.Inject
 
-class ViewBlogFragment : BaseBlogFragment() {
+@MainScope
+class ViewBlogFragment
+@Inject
+constructor(
+    private val viewModelFactory: ViewModelProvider.Factory,
+    private val requestManager: RequestManager
+) : BaseBlogFragment(R.layout.fragment_view_blog) {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_view_blog, container, false)
+    val viewModel: BlogViewModel by viewModels {
+        viewModelFactory
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        cancelActiveJobs()
+
+        savedInstanceState?.let { inState ->
+            (inState[BLOG_VIEW_STATE_BUNDLE_KEY] as BlogViewState)?.let { viewState ->
+                viewModel.setViewState(viewState)
+            }
+        }
+    }
+
+
+    override fun onSaveInstanceState(outState: Bundle) {
+
+        val viewState = viewModel.viewState.value
+
+        viewState?.blogFields?.blogList = ArrayList()
+
+        outState.putParcelable(
+            BLOG_VIEW_STATE_BUNDLE_KEY,
+            viewState
+        )
+
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun cancelActiveJobs() {
+        viewModel.cancelActiveJobs()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -81,7 +118,7 @@ class ViewBlogFragment : BaseBlogFragment() {
     }
 
     private fun setBlogProperties(blogPost: BlogPost) {
-        dependencyProvider.getGlideRequestManager()
+        requestManager
             .load(blogPost.image)
             .into(blog_image)
 

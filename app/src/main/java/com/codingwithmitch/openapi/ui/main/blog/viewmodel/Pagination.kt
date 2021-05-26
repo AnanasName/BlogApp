@@ -1,6 +1,5 @@
 package com.codingwithmitch.openapi.ui.main.blog.viewmodel
 
-import android.util.Log
 import com.codingwithmitch.openapi.ui.main.blog.state.BlogStateEvent
 import com.codingwithmitch.openapi.ui.main.blog.state.BlogStateEvent.BlogSearchEvent
 import com.codingwithmitch.openapi.ui.main.blog.state.BlogViewState

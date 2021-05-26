@@ -1,4 +1,4 @@
-package com.codingwithmitch.openapi.util
+  package com.codingwithmitch.openapi.util
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -10,11 +10,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.navigation.NavController
-import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.codingwithmitch.openapi.R
+import com.codingwithmitch.openapi.fragments.main.account.AccountNavHostFragment
+import com.codingwithmitch.openapi.fragments.main.blog.BlogNavHostFragment
+import com.codingwithmitch.openapi.fragments.main.create_blog.CreateBlogNavHostFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.parcel.Parcelize
 
@@ -24,8 +26,7 @@ class BottomNavController(
     val context: Context,
     @IdRes val containerId: Int,
     @IdRes val appStartDestinationId: Int,
-    val graphChangeListener: OnNavigationGraphChanged?,
-    val navGraphProvider: NavGraphProvider
+    val graphChangeListener: OnNavigationGraphChanged?
 ) {
 
     lateinit var activity: Activity
@@ -49,7 +50,7 @@ class BottomNavController(
     fun onNavigationItemSelected(itemId: Int = navigationBackStack.last()): Boolean{
 
         val fragment = fragmentManager.findFragmentByTag(itemId.toString())
-            ?: NavHostFragment.create(navGraphProvider.getNavGraphId(itemId))
+            ?: createNavHost(itemId)
 
         fragmentManager.beginTransaction()
             .setCustomAnimations(
@@ -70,6 +71,26 @@ class BottomNavController(
 
         return true
     }
+
+    private fun createNavHost(menuItemId: Int) =
+        when(menuItemId){
+
+            R.id.menu_nav_account -> {
+                AccountNavHostFragment.create(R.navigation.nav_account)
+            }
+
+            R.id.menu_nav_blog -> {
+                BlogNavHostFragment.create(R.navigation.nav_blog)
+            }
+
+            R.id.menu_nav_create_blog -> {
+                CreateBlogNavHostFragment.create(R.navigation.nav_create_blog)
+            }
+
+            else -> {
+                BlogNavHostFragment.create(R.navigation.nav_blog)
+            }
+        }
 
     @SuppressLint("RestrictedApi")
     fun onBackPressed(){
@@ -128,11 +149,6 @@ class BottomNavController(
                 listener.invoke(itemId)
             }
         }
-    }
-
-    interface NavGraphProvider{
-        @NavigationRes
-        fun getNavGraphId(itemId: Int): Int
     }
 
     interface OnNavigationGraphChanged{

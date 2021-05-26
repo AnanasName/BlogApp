@@ -2,7 +2,6 @@ package com.codingwithmitch.openapi.api.auth
 
 import android.content.SharedPreferences
 import com.codingwithmitch.openapi.di.auth.AuthScope
-import com.codingwithmitch.openapi.ui.auth.state.AuthViewState
 import com.codingwithmitch.openapi.models.AccountProperties
 import com.codingwithmitch.openapi.models.AuthToken
 import com.codingwithmitch.openapi.persistence.AccountPropertiesDao
@@ -10,6 +9,7 @@ import com.codingwithmitch.openapi.repository.util.safeApiCall
 import com.codingwithmitch.openapi.ui.DataState
 import com.codingwithmitch.openapi.ui.Response
 import com.codingwithmitch.openapi.ui.ResponseType
+import com.codingwithmitch.openapi.ui.auth.state.AuthViewState
 import com.codingwithmitch.openapi.util.PreferencesKeys
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore

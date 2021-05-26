@@ -19,20 +19,23 @@ import dagger.Provides
 import javax.inject.Singleton
 
 @Module
-class AppModule{
+object AppModule{
 
+    @JvmStatic
     @Singleton
     @Provides
     fun provideSharedPreferences(application: Application): SharedPreferences{
         return application.getSharedPreferences(PreferencesKeys.APP_PREFERNCES, Context.MODE_PRIVATE)
     }
 
+    @JvmStatic
     @Singleton
     @Provides
     fun provideSharedPrefsEditor(sharedPreferences: SharedPreferences): SharedPreferences.Editor{
         return sharedPreferences.edit()
     }
 
+    @JvmStatic
     @Singleton
     @Provides
     fun provideAppDb(app: Application): AppDatabase{
@@ -42,12 +45,14 @@ class AppModule{
             .build()
     }
 
+    @JvmStatic
     @Singleton
     @Provides
     fun provideAccountPropertiesDao(db: AppDatabase): AccountPropertiesDao{
         return db.getAccountPropertiesDao()
     }
 
+    @JvmStatic
     @Singleton
     @Provides
     fun provideRequestOptions(): RequestOptions{
@@ -56,6 +61,7 @@ class AppModule{
             .error(R.drawable.default_image)
     }
 
+    @JvmStatic
     @Singleton
     @Provides
     fun provideGlideInstance(application: Application, requestOptions: RequestOptions): RequestManager{
@@ -63,12 +69,14 @@ class AppModule{
             .setDefaultRequestOptions(requestOptions)
     }
 
+    @JvmStatic
     @Singleton
     @Provides
     fun provideFirebaseFirestore(): FirebaseFirestore {
         return FirebaseFirestore.getInstance()
     }
 
+    @JvmStatic
     @Singleton
     @Provides
     fun provideFirebaseAuth(): FirebaseAuth {

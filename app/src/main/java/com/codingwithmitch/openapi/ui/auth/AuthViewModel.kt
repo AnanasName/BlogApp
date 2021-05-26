@@ -1,16 +1,14 @@
 package com.codingwithmitch.openapi.ui.auth
 
-import androidx.lifecycle.*
-import com.codingwithmitch.openapi.ui.auth.state.*
-import com.codingwithmitch.openapi.ui.auth.state.AuthStateEvent.*
 import com.codingwithmitch.openapi.models.AuthToken
 import com.codingwithmitch.openapi.repository.auth.AuthRepository
 import com.codingwithmitch.openapi.ui.BaseViewModel
 import com.codingwithmitch.openapi.ui.DataState
 import com.codingwithmitch.openapi.ui.Response
 import com.codingwithmitch.openapi.ui.ResponseType
-import com.codingwithmitch.openapi.util.AbsentLiveData
-import kotlinx.coroutines.*
+import com.codingwithmitch.openapi.ui.auth.state.*
+import com.codingwithmitch.openapi.ui.auth.state.AuthStateEvent.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class AuthViewModel

@@ -3,6 +3,7 @@ package com.codingwithmitch.openapi.api.main
 import android.net.Uri
 import androidx.core.net.toUri
 import com.codingwithmitch.openapi.api.auth.USERS_COLLECTION
+import com.codingwithmitch.openapi.di.main.MainScope
 import com.codingwithmitch.openapi.models.AccountProperties
 import com.codingwithmitch.openapi.models.BlogPost
 import com.codingwithmitch.openapi.repository.util.safeApiCall
@@ -11,8 +12,7 @@ import com.codingwithmitch.openapi.ui.Response
 import com.codingwithmitch.openapi.ui.ResponseType
 import com.codingwithmitch.openapi.ui.main.account.state.AccountViewState
 import com.codingwithmitch.openapi.ui.main.blog.state.BlogViewState
-import com.codingwithmitch.openapi.ui.main.blog.state.BlogViewState.*
-import com.codingwithmitch.openapi.ui.main.create_blog.CreateBlogViewModel
+import com.codingwithmitch.openapi.ui.main.blog.state.BlogViewState.BlogFields
 import com.codingwithmitch.openapi.ui.main.create_blog.state.CreateBlogViewState
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseUser
@@ -29,6 +29,7 @@ const val SUCCESS_DELETED = "Success Deleted"
 const val SUCCESS_UPDATED = "Success Updated"
 const val SUCCESS_CREATE = "Success Create"
 
+@MainScope
 class MainService(
     private val firebaseFirestore: FirebaseFirestore,
     private val firebaseReference: StorageReference

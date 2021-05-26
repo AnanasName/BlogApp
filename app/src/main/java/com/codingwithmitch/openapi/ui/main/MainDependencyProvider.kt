@@ -1,11 +1,11 @@
 package com.codingwithmitch.openapi.ui.main
 
 import com.bumptech.glide.RequestManager
-import com.codingwithmitch.openapi.viewmodels.ViewModelProviderFactory
+import com.codingwithmitch.openapi.viewmodels.AuthViewModelFactory
 
 interface MainDependencyProvider {
 
-    fun getViewModelProviderFactory(): ViewModelProviderFactory
+    fun getViewModelProviderFactory(): AuthViewModelFactory
 
     fun getGlideRequestManager(): RequestManager
 }

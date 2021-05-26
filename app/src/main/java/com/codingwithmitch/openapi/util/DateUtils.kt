@@ -1,6 +1,5 @@
 package com.codingwithmitch.openapi.util
 
-import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 

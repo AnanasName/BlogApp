@@ -1,17 +1,19 @@
 package com.codingwithmitch.openapi.repository.auth
 
 import com.codingwithmitch.openapi.api.auth.AuthService
+import com.codingwithmitch.openapi.di.auth.AuthScope
+import com.codingwithmitch.openapi.repository.JobManager
+import com.codingwithmitch.openapi.session.SessionManager
+import com.codingwithmitch.openapi.ui.DataState
+import com.codingwithmitch.openapi.ui.Response
+import com.codingwithmitch.openapi.ui.ResponseType
 import com.codingwithmitch.openapi.ui.auth.state.AuthViewState
 import com.codingwithmitch.openapi.ui.auth.state.LoginFields
 import com.codingwithmitch.openapi.ui.auth.state.RegistrationFields
 import com.codingwithmitch.openapi.ui.auth.state.ResetPasswordFields
-import com.codingwithmitch.openapi.session.SessionManager
-import com.codingwithmitch.openapi.ui.DataState
-import com.codingwithmitch.openapi.repository.JobManager
-import com.codingwithmitch.openapi.ui.Response
-import com.codingwithmitch.openapi.ui.ResponseType
 import javax.inject.Inject
 
+@AuthScope
 class AuthRepository
 @Inject
 constructor(

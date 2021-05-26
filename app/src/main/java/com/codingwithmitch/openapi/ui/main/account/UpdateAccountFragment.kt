@@ -2,21 +2,52 @@ package com.codingwithmitch.openapi.ui.main.account
 
 import android.os.Bundle
 import android.view.*
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.codingwithmitch.openapi.R
+import com.codingwithmitch.openapi.di.main.MainScope
 import com.codingwithmitch.openapi.models.AccountProperties
-import com.codingwithmitch.openapi.ui.main.account.BaseAccountFragment
+import com.codingwithmitch.openapi.ui.main.account.state.ACCOUNT_VIEW_STATE_BUNDLE_KEY
 import com.codingwithmitch.openapi.ui.main.account.state.AccountStateEvent
+import com.codingwithmitch.openapi.ui.main.account.state.AccountViewState
 import kotlinx.android.synthetic.main.fragment_update_account.*
+import javax.inject.Inject
 
-class UpdateAccountFragment : BaseAccountFragment() {
+@MainScope
+class UpdateAccountFragment
+    @Inject
+    constructor(
+        private val viewModelFactory: ViewModelProvider.Factory
+    ) : BaseAccountFragment(R.layout.fragment_update_account) {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_update_account, container, false)
+    val viewModel: AccountViewModel by viewModels {
+        viewModelFactory
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        cancelActiveJobs()
+
+        savedInstanceState?.let { inState ->
+            (inState[ACCOUNT_VIEW_STATE_BUNDLE_KEY] as AccountViewState)?.let { viewState ->
+                viewModel.setViewState(viewState)
+            }
+        }
+    }
+
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putParcelable(
+            ACCOUNT_VIEW_STATE_BUNDLE_KEY,
+            viewModel.viewState.value
+        )
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun cancelActiveJobs() {
+        viewModel.cancelJobs()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

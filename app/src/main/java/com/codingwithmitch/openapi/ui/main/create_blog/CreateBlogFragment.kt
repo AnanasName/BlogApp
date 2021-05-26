@@ -5,32 +5,36 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.*
-import androidx.core.net.toUri
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import com.bumptech.glide.RequestManager
 import com.codingwithmitch.openapi.R
 import com.codingwithmitch.openapi.api.main.SUCCESS_CREATE
+import com.codingwithmitch.openapi.di.main.MainScope
 import com.codingwithmitch.openapi.ui.*
-import com.codingwithmitch.openapi.ui.main.MainActivity
-import com.codingwithmitch.openapi.ui.main.create_blog.state.CreateBlogStateEvent
+import com.codingwithmitch.openapi.ui.main.create_blog.state.CREATE_BLOG_VIEW_STATE_BUNDLE_KEY
 import com.codingwithmitch.openapi.ui.main.create_blog.state.CreateBlogStateEvent.CreateNewBlogEvent
+import com.codingwithmitch.openapi.ui.main.create_blog.state.CreateBlogViewState
 import com.codingwithmitch.openapi.util.Constants.Companion.GALLERY_REQUEST_CODE
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
 import kotlinx.android.synthetic.main.fragment_create_blog.*
-import retrofit2.http.Url
+import javax.inject.Inject
 
 const val ERROR_SOMETHING_WRONG_WITH_IMAGE = "Something Wrong With Image"
 
-class CreateBlogFragment : BaseCreateBlogFragment() {
+@MainScope
+class CreateBlogFragment
+@Inject
+constructor(
+    private val viewModelFactory: ViewModelProvider.Factory,
+    private val requestManager: RequestManager
+) : BaseCreateBlogFragment(R.layout.fragment_create_blog) {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_create_blog, container, false)
+    val viewModel: CreateBlogViewModel by viewModels {
+        viewModelFactory
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -51,6 +55,34 @@ class CreateBlogFragment : BaseCreateBlogFragment() {
 
         subscribeObservers()
     }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        cancelActiveJobs()
+
+        savedInstanceState?.let { inState ->
+            (inState[CREATE_BLOG_VIEW_STATE_BUNDLE_KEY] as CreateBlogViewState)?.let { viewState ->
+                viewModel.setViewState(viewState)
+            }
+        }
+    }
+
+    override fun cancelActiveJobs() {
+        viewModel.cancelActiveJobs()
+    }
+
+
+    override fun onSaveInstanceState(outState: Bundle) {
+
+        outState.putParcelable(
+            CREATE_BLOG_VIEW_STATE_BUNDLE_KEY,
+            viewModel.viewState.value
+        )
+
+        super.onSaveInstanceState(outState)
+    }
+
 
     private fun subscribeObservers() {
         viewModel.dataState.observe(viewLifecycleOwner, Observer { dataState ->
@@ -87,7 +119,7 @@ class CreateBlogFragment : BaseCreateBlogFragment() {
 
     private fun setBlogProperties(title: String?, body: String?, image: String?) {
         image?.let {
-            dependencyProvider.getGlideRequestManager()
+            requestManager
                 .load(image)
                 .into(blog_image)
         } ?: setDefaultImage()
@@ -97,7 +129,7 @@ class CreateBlogFragment : BaseCreateBlogFragment() {
     }
 
     private fun setDefaultImage() {
-        dependencyProvider.getGlideRequestManager()
+        requestManager
             .load(R.drawable.default_image)
             .into(blog_image)
     }

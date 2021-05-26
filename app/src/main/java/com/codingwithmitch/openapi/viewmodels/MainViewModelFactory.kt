@@ -2,13 +2,12 @@ package com.codingwithmitch.openapi.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import java.lang.Exception
-import java.lang.IllegalArgumentException
-import java.lang.RuntimeException
+import com.codingwithmitch.openapi.di.main.MainScope
 import javax.inject.Inject
 import javax.inject.Provider
 
-class ViewModelProviderFactory
+@MainScope
+class MainViewModelFactory
 @Inject
 constructor(
     private val creators: Map<Class<out ViewModel>, @JvmSuppressWildcards Provider<ViewModel>>
